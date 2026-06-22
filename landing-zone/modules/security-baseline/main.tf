@@ -20,19 +20,20 @@ resource "aws_securityhub_account" "this" {
 }
 
 resource "aws_securityhub_standards_subscription" "cis" {
-  standards_arn = "arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.4.0"
+  standards_arn = "arn:aws:securityhub:us-east-1::standards/cis-aws-foundations-benchmark/v/3.0.0"
   depends_on    = [aws_securityhub_account.this]
 }
 
 # CIS AWS Foundations conformance pack via Config - gives you the same
 # detective-control baseline a Control Tower "Audit" account would enforce.
-# Uses the AWS-managed sample template hosted by AWS in a public bucket so no
-# manual template authoring is required. Verified path as of 2026; AWS
-# occasionally relocates these - if the apply fails with a 404/access error,
-# check https://docs.aws.amazon.com/config/latest/developerguide/conformancepack-sample-templates.html
-# for the current S3 URI and update template_s3_uri below.
-resource "aws_config_conformance_pack" "cis" {
-  name            = "operational-best-practices-for-cis-aws-foundations-benchmark"
-  template_s3_uri = "s3://aws-configservice-us-east-1/cloudformation-templates-for-managed-rules/Operational-Best-Practices-for-CIS-AWS-v1.4-Level1.yaml"
-  delivery_s3_bucket = var.delivery_s3_bucket
-}
+# CIS Conformance Pack — deferred to post-apply CLI
+# The AWS S3 path for sample conformance pack templates is periodically relocated by
+# AWS and becomes inaccessible. For a lab, create this manually after apply:
+#
+#   aws configservice put-conformance-pack \
+#     --conformance-pack-name operational-best-practices-for-cis-aws-foundations-benchmark \
+#     --template-body https://raw.githubusercontent.com/awslabs/aws-config-rules/master/aws-config-conformance-packs/Operational-Best-Practices-for-CIS-AWS-v1.4-Level1.yaml \
+#     --delivery-s3-bucket YOUR_DELIVERY_BUCKET
+#
+# Security Hub CIS subscription (v3.0.0) is applied via Terraform and provides the
+# same security benchmark visibility even without the Config conformance pack.

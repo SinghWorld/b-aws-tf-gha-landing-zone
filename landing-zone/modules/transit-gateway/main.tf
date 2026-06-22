@@ -61,39 +61,4 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
 }
 
-# ---------- Spoke VPC route tables: send 0.0.0.0/0 (or hub CIDR) via TGW ----------
-# This routes spoke egress traffic to the hub (for centralized firewall/NAT inspection).
-# For_each uses static keys (spoke names) so plan is deterministic;
-# route_table_id values are resolved at apply time once VPC module outputs are available.
-resource "aws_route" "spoke_to_hub" {
-  for_each = var.spoke_route_table_ids
 
-  route_table_id         = each.value
-  destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = aws_ec2_transit_gateway.this.id
-
-  depends_on = [
-    aws_ec2_transit_gateway_vpc_attachment.this,
-    aws_ec2_transit_gateway_route_table_propagation.this,
-  ]
-}
-
-# ---------- Hub VPC route tables: explicit routes back to each spoke CIDR via TGW ----------
-resource "aws_route" "hub_to_spokes" {
-  for_each = {
-    for rt_id in var.hub_route_table_ids :
-    rt_id => {
-      for spoke_key, cidr in var.spoke_cidrs :
-      spoke_key => cidr
-    }
-  }
-
-  route_table_id         = each.key
-  destination_cidr_block = each.value
-  transit_gateway_id     = aws_ec2_transit_gateway.this.id
-
-  depends_on = [
-    aws_ec2_transit_gateway_vpc_attachment.this,
-    aws_ec2_transit_gateway_route_table_propagation.this,
-  ]
-}

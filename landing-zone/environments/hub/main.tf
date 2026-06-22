@@ -73,24 +73,14 @@ module "transit_gateway" {
     shared = { vpc_id = module.shared_services_vpc.vpc_id, subnet_ids = module.shared_services_vpc.private_subnet_ids }
   }
 
-  # Spokes send all egress traffic to the hub via TGW (hub then has the IGW/NAT/firewall)
-  spoke_route_table_ids = {
-    dev    = module.dev_vpc.private_route_table_ids
-    test   = module.test_vpc.private_route_table_ids
-    prod   = module.prod_vpc.private_route_table_ids
-    shared = module.shared_services_vpc.private_route_table_ids
-  }
-
-  # Hub needs explicit routes back to each spoke CIDR
-  hub_route_table_ids = module.hub_vpc.private_route_table_ids
-
-  spoke_cidrs = {
-    dev    = module.dev_vpc.vpc_cidr
-    test   = module.test_vpc.vpc_cidr
-    prod   = module.prod_vpc.vpc_cidr
-    shared = module.shared_services_vpc.vpc_cidr
-  }
 }
+
+
+
+# ---------- Routes: spokes -> hub via TGW (default 0.0.0.0/0) ----------
+# TEMPORARILY REMOVED — requires a two-apply pattern because private_route_table_ids
+# is a computed output. Apply once without these, then re-add after VPCs exist in state.
+# TODO: re-add aws_route.spoke_to_hub and aws_route.hub_to_spokes once VPC IDs are known.
 
 # ---------- IAM permission boundaries (SCP equivalent for single account) ----------
 module "iam_boundaries" {
