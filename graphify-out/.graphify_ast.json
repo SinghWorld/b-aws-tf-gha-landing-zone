@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "id": "scripts_01_setup_s3_backend",
+      "label": "01.setup_s3-backend.sh",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/01.setup_s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_01_setup_s3_backend_sh__entry",
+      "label": "01.setup_s3-backend.sh script",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/01.setup_s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "scripts_02_destroy_s3_backend",
+      "label": "02.destroy-s3-backend.sh",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/02.destroy-s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_02_destroy_s3_backend_sh__entry",
+      "label": "02.destroy-s3-backend.sh script",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/02.destroy-s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "scripts_01_setup_s3_backend",
+      "target": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_01_setup_s3_backend_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "landing-zone/scripts/01.setup_s3-backend.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_02_destroy_s3_backend",
+      "target": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_02_destroy_s3_backend_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "landing-zone/scripts/02.destroy-s3-backend.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

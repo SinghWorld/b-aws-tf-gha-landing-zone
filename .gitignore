@@ -79,3 +79,9 @@ terraform-ansible-cicd-guide.jsx.txt
 .claud/
 .claud/*
 ! CLAUDE.md
+
+# .graphifyignore
+node_modules/
+dist/
+*.generated.py
+

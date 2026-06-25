@@ -1,0 +1,1019 @@
+{
+  "nodes": [
+    {
+      "id": "scripts_01_setup_s3_backend",
+      "label": "01.setup_s3-backend.sh",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/01.setup_s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_01_setup_s3_backend_sh__entry",
+      "label": "01.setup_s3-backend.sh script",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/01.setup_s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "scripts_02_destroy_s3_backend",
+      "label": "02.destroy-s3-backend.sh",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/02.destroy-s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_02_destroy_s3_backend_sh__entry",
+      "label": "02.destroy-s3-backend.sh script",
+      "file_type": "code",
+      "source_file": "landing-zone/scripts/02.destroy-s3-backend.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_md_landing_zone_architecture",
+      "label": "Landing Zone Architecture Overview",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_hub_and_spoke_topology",
+      "label": "Hub-and-Spoke Network Topology",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_boundaries_enterprise_analogy",
+      "label": "Enterprise Concept to Implementation Mapping",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_repo_layout",
+      "label": "Repository Layout",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_key_configuration",
+      "label": "Key Configuration Details",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_vpc",
+      "label": "modules/vpc Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_transit_gateway",
+      "label": "modules/transit-gateway Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_iam_boundaries",
+      "label": "modules/iam-boundaries Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_logging",
+      "label": "modules/logging Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_security_baseline",
+      "label": "modules/security-baseline Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_backup",
+      "label": "modules/backup Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_module_github_oidc",
+      "label": "modules/github-oidc Module",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_environments_hub_main",
+      "label": "environments/hub/main.tf Root Composition",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_cross_module_wiring",
+      "label": "Cross-Module Topological Wiring",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_bootstrap_process",
+      "label": "Two-Phase Bootstrap Process",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_caveats",
+      "label": "Known Caveats and Limitations",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_deny_cross_environment_access",
+      "label": "IAM DenyCrossEnvironmentAccess Statement",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_deny_disabling_security",
+      "label": "IAM DenyDisablingSecurityTooling Statement",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_md_deny_outside_home_region",
+      "label": "IAM DenyOutsideHomeRegion Statement",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_md_overview",
+      "label": "Personal AWS Landing Zone README Overview",
+      "file_type": "document",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_md_architecture_diagram",
+      "label": "README Architecture Diagram",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_md_prerequisites",
+      "label": "Prerequisites for Setup",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_md_known_caveats",
+      "label": "README Known Caveats",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_md_learning_path",
+      "label": "Suggested Learning Path",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "drift_detection_yml_workflow",
+      "label": "drift-detection GitHub Workflow",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "drift_detection_job",
+      "label": "drift-check Job",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "drift_detection_open_issue_step",
+      "label": "Open Issue If Drift Detected Step",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "drift_detection_configure_oidc",
+      "label": "Configure AWS Credentials OIDC Step",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "drift_detection_terraform_plan",
+      "label": "Terraform Plan Detailed Exitcode Step",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "terraform_plan_apply_yml_workflow",
+      "label": "terraform-plan-apply GitHub Workflow",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "terraform_plan_apply_plan_job",
+      "label": "Terraform Plan Job",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "terraform_plan_apply_apply_job",
+      "label": "Terraform Apply Job",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "terraform_plan_apply_upload_artifact",
+      "label": "Upload Plan Artifact Step",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "terraform_plan_apply_download_artifact",
+      "label": "Download Plan Artifact Step",
+      "file_type": "code",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "oidc_role_assumption_concept",
+      "label": "GitHub OIDC Role Assumption Pattern",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "production_environment_gate",
+      "label": "Production Environment Manual Approval Gate",
+      "file_type": "concept",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "drift_detection_mechanism",
+      "label": "Drift Detection via plan -detailed-exitcode",
+      "file_type": "rationale",
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "scripts_01_setup_s3_backend",
+      "target": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_01_setup_s3_backend_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "landing-zone/scripts/01.setup_s3-backend.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_02_destroy_s3_backend",
+      "target": "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_02_destroy_s3_backend_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "landing-zone/scripts/02.destroy-s3-backend.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_landing_zone_architecture",
+      "target": "claude_md_hub_and_spoke_topology",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_vpc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_transit_gateway",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_iam_boundaries",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_logging",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_security_baseline",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_backup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_module_github_oidc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "claude_md_environments_hub_main",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "drift_detection_yml_workflow",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_repo_layout",
+      "target": "terraform_plan_apply_yml_workflow",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_module_iam_boundaries",
+      "target": "claude_md_deny_cross_environment_access",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_module_iam_boundaries",
+      "target": "claude_md_deny_disabling_security",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_module_iam_boundaries",
+      "target": "claude_md_deny_outside_home_region",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_vpc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_transit_gateway",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_iam_boundaries",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_logging",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_security_baseline",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_backup",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_environments_hub_main",
+      "target": "claude_md_module_github_oidc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_cross_module_wiring",
+      "target": "claude_md_environments_hub_main",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_module_transit_gateway",
+      "target": "claude_md_module_vpc",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_module_security_baseline",
+      "target": "claude_md_module_logging",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_bootstrap_process",
+      "target": "claude_md_module_github_oidc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_bootstrap_process",
+      "target": "production_environment_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_module_github_oidc",
+      "target": "oidc_role_assumption_concept",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "terraform_plan_apply_yml_workflow",
+      "target": "production_environment_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "terraform_plan_apply_yml_workflow",
+      "target": "oidc_role_assumption_concept",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "drift_detection_yml_workflow",
+      "target": "oidc_role_assumption_concept",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "drift_detection_yml_workflow",
+      "target": "drift_detection_mechanism",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "terraform_plan_apply_apply_job",
+      "target": "terraform_plan_apply_plan_job",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "terraform_plan_apply_apply_job",
+      "target": "terraform_plan_apply_download_artifact",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "terraform_plan_apply_plan_job",
+      "target": "terraform_plan_apply_upload_artifact",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "drift_detection_job",
+      "target": "drift_detection_configure_oidc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "drift_detection_job",
+      "target": "drift_detection_terraform_plan",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "drift_detection_job",
+      "target": "drift_detection_open_issue_step",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "drift_detection_terraform_plan",
+      "target": "drift_detection_mechanism",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/drift-detection.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_md_overview",
+      "target": "claude_md_landing_zone_architecture",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_md_architecture_diagram",
+      "target": "claude_md_hub_and_spoke_topology",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_md_known_caveats",
+      "target": "claude_md_caveats",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "readme_md_prerequisites",
+      "target": "claude_md_bootstrap_process",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_cross_module_wiring",
+      "target": "claude_md_module_logging",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_cross_module_wiring",
+      "target": "claude_md_module_security_baseline",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_key_configuration",
+      "target": "oidc_role_assumption_concept",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_caveats",
+      "target": "claude_md_deny_cross_environment_access",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_caveats",
+      "target": "claude_md_module_security_baseline",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_caveats",
+      "target": "claude_md_module_github_oidc",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "claude_md_caveats",
+      "target": "claude_md_environments_hub_main",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "cicd_workflow_pair",
+      "label": "Landing Zone CI/CD Workflow Pair",
+      "nodes": [
+        "terraform_plan_apply_yml_workflow",
+        "drift_detection_yml_workflow",
+        "oidc_role_assumption_concept",
+        "production_environment_gate"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/landing-zone/.github/workflows/terraform-plan-apply.yml"
+    },
+    {
+      "id": "iam_boundary_statements",
+      "label": "IAM Permission Boundary Statements",
+      "nodes": [
+        "claude_md_deny_cross_environment_access",
+        "claude_md_deny_disabling_security",
+        "claude_md_deny_outside_home_region",
+        "claude_md_module_iam_boundaries"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md"
+    },
+    {
+      "id": "landing_zone_module_composition",
+      "label": "Hub Root Module Composition",
+      "nodes": [
+        "claude_md_environments_hub_main",
+        "claude_md_module_vpc",
+        "claude_md_module_transit_gateway",
+        "claude_md_module_iam_boundaries",
+        "claude_md_module_logging",
+        "claude_md_module_security_baseline",
+        "claude_md_module_backup",
+        "claude_md_module_github_oidc"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/home/dc-ops/b-aws-tf-gha-landing-zone/CLAUDE.md"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

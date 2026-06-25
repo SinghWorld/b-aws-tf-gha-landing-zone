@@ -1,0 +1,177 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1782369243.8003685,
+    "ast_hash": "e1073342e958ac9f00716938c8f165e3",
+    "semantic_hash": ""
+  },
+  ".claude/settings.local.json": {
+    "mtime": 1782368488.6061273,
+    "ast_hash": "7dcf254d7c0c87464e9ccaac8099038a",
+    "semantic_hash": ""
+  },
+  "landing-zone/.claude/settings.local.json": {
+    "mtime": 1782122422.2693095,
+    "ast_hash": "33f3c9b09eb0983a3afe09a2085dc175",
+    "semantic_hash": ""
+  },
+  "landing-zone/environments/hub/main.tf": {
+    "mtime": 1782128959.3543756,
+    "ast_hash": "d4097ecbbf6e4ae68a0d9a993cf8f58d",
+    "semantic_hash": ""
+  },
+  "landing-zone/environments/hub/outputs.tf": {
+    "mtime": 1782104474.0,
+    "ast_hash": "429fabb2bd4155c16971c33715df1243",
+    "semantic_hash": ""
+  },
+  "landing-zone/environments/hub/terraform.tfvars": {
+    "mtime": 1782358100.9428117,
+    "ast_hash": "0b417fa70183635abf59d9ecc0a110b1",
+    "semantic_hash": ""
+  },
+  "landing-zone/environments/hub/variables.tf": {
+    "mtime": 1782124066.2271538,
+    "ast_hash": "f324819ac9110131d1450cd1f1f29478",
+    "semantic_hash": ""
+  },
+  "landing-zone/environments/hub/versions.tf": {
+    "mtime": 1782126267.5285192,
+    "ast_hash": "8af077a874fe178c93d8437ed0c0f6dc",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/backup/main.tf": {
+    "mtime": 1782104122.0,
+    "ast_hash": "f0e1bde96f4f162e14512d2f4edc9e9e",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/backup/outputs.tf": {
+    "mtime": 1782104130.0,
+    "ast_hash": "d0e3973080327aaabdb8d1ddfdde673d",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/github-oidc/main.tf": {
+    "mtime": 1782104449.0,
+    "ast_hash": "0d991d0f03c30cae1a25985179ef3c5c",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/github-oidc/outputs.tf": {
+    "mtime": 1782104461.0,
+    "ast_hash": "ea122ef6c5e0a190d551e75d3e6b9bc1",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/github-oidc/variables.tf": {
+    "mtime": 1782124074.1392276,
+    "ast_hash": "d74b13d63beeaaf60bbe4e4319bc76af",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/iam-boundaries/main.tf": {
+    "mtime": 1782124067.4621654,
+    "ast_hash": "3fe05866fb60b25d2617f6a5c42813e6",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/iam-boundaries/outputs.tf": {
+    "mtime": 1782104028.0,
+    "ast_hash": "15ab23391d52738bebe918fd0f40769b",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/iam-boundaries/variables.tf": {
+    "mtime": 1782104008.0,
+    "ast_hash": "c327f1f7b1cd3e480c5802e113fc7cd6",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/logging/main.tf": {
+    "mtime": 1782129953.9044719,
+    "ast_hash": "59d56d9f0132f1cf7345c396fe4ba7ca",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/logging/outputs.tf": {
+    "mtime": 1782104062.0,
+    "ast_hash": "2a9165f1a3c65f7f3f1fcf6589ce7393",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/logging/variables.tf": {
+    "mtime": 1782104034.0,
+    "ast_hash": "4bd1662b66dcd55d8e83df5ea3875eb3",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/security-baseline/main.tf": {
+    "mtime": 1782129593.7157338,
+    "ast_hash": "e3e3ee0994df81e57e59277ec8c7271e",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/security-baseline/outputs.tf": {
+    "mtime": 1782129617.535919,
+    "ast_hash": "25f8597ead095e6a562d9948262efc39",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/security-baseline/variables.tf": {
+    "mtime": 1782104101.0,
+    "ast_hash": "cf90c1e93add1a00bb00bb99566ab1b0",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/transit-gateway/main.tf": {
+    "mtime": 1782127673.8299038,
+    "ast_hash": "b40e9064af0170c644f5ef3c70dc6bee",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/transit-gateway/outputs.tf": {
+    "mtime": 1782104003.0,
+    "ast_hash": "53db2f6ebf985e494289c8571ec10791",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/transit-gateway/variables.tf": {
+    "mtime": 1782127688.8269725,
+    "ast_hash": "e75dbdd260811111856f24728c2daf6a",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/vpc/main.tf": {
+    "mtime": 1782103961.0,
+    "ast_hash": "4074aba752fd0ba704c6d684362983b6",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/vpc/outputs.tf": {
+    "mtime": 1782103977.0,
+    "ast_hash": "66eafea3589ee24044742e899f35930f",
+    "semantic_hash": ""
+  },
+  "landing-zone/modules/vpc/variables.tf": {
+    "mtime": 1782103970.0,
+    "ast_hash": "b90d44f2a81491cdef17e700e602c577",
+    "semantic_hash": ""
+  },
+  "landing-zone/scripts/.claude/settings.local.json": {
+    "mtime": 1782123618.6457343,
+    "ast_hash": "a27a9bd90fd5825762f189236a09c9af",
+    "semantic_hash": ""
+  },
+  "landing-zone/scripts/01.setup_s3-backend.sh": {
+    "mtime": 1782126208.1684966,
+    "ast_hash": "888ef98c637544d6394564e4f3bf6f35",
+    "semantic_hash": ""
+  },
+  "landing-zone/scripts/02.destroy-s3-backend.sh": {
+    "mtime": 1782130533.1507459,
+    "ast_hash": "b539aeb477301be9bf4ec022c240b7ba",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1782368488.720132,
+    "ast_hash": "6d33e7331918a1d0cf839efdb0397e5c",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1782357977.4865828,
+    "ast_hash": "d3f9a18dad49ea95b3b75a17f73d60c1",
+    "semantic_hash": ""
+  },
+  "landing-zone/.github/workflows/drift-detection.yml": {
+    "mtime": 1782122494.2700052,
+    "ast_hash": "6c7fe7b13cc5e06ea56106e19375cd5e",
+    "semantic_hash": ""
+  },
+  "landing-zone/.github/workflows/terraform-plan-apply.yml": {
+    "mtime": 1782122494.2700052,
+    "ast_hash": "f53be832821abee23bc02dd7147c074c",
+    "semantic_hash": ""
+  }
+}

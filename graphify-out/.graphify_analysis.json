@@ -1,0 +1,203 @@
+{
+  "communities": {
+    "0": [
+      "claude_md_cross_module_wiring",
+      "claude_md_environments_hub_main",
+      "claude_md_module_backup",
+      "claude_md_module_logging",
+      "claude_md_module_security_baseline",
+      "claude_md_module_transit_gateway",
+      "claude_md_module_vpc",
+      "claude_md_repo_layout"
+    ],
+    "1": [
+      "claude_md_bootstrap_process",
+      "claude_md_key_configuration",
+      "claude_md_module_github_oidc",
+      "oidc_role_assumption_concept",
+      "production_environment_gate",
+      "readme_md_prerequisites",
+      "terraform_plan_apply_yml_workflow"
+    ],
+    "2": [
+      "claude_md_caveats",
+      "claude_md_deny_cross_environment_access",
+      "claude_md_deny_disabling_security",
+      "claude_md_deny_outside_home_region",
+      "claude_md_module_iam_boundaries",
+      "readme_md_known_caveats"
+    ],
+    "3": [
+      "drift_detection_configure_oidc",
+      "drift_detection_job",
+      "drift_detection_mechanism",
+      "drift_detection_open_issue_step",
+      "drift_detection_terraform_plan",
+      "drift_detection_yml_workflow"
+    ],
+    "4": [
+      "claude_md_hub_and_spoke_topology",
+      "claude_md_landing_zone_architecture",
+      "readme_md_architecture_diagram",
+      "readme_md_overview"
+    ],
+    "5": [
+      "terraform_plan_apply_apply_job",
+      "terraform_plan_apply_download_artifact",
+      "terraform_plan_apply_plan_job",
+      "terraform_plan_apply_upload_artifact"
+    ],
+    "6": [
+      "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_01_setup_s3_backend_sh__entry",
+      "scripts_01_setup_s3_backend"
+    ],
+    "7": [
+      "home_dc_ops_b_aws_tf_gha_landing_zone_landing_zone_scripts_02_destroy_s3_backend_sh__entry",
+      "scripts_02_destroy_s3_backend"
+    ],
+    "8": [
+      "claude_md_module_boundaries_enterprise_analogy"
+    ],
+    "9": [
+      "readme_md_learning_path"
+    ]
+  },
+  "cohesion": {
+    "0": 0.5714285714285714,
+    "1": 0.3333333333333333,
+    "2": 0.3333333333333333,
+    "3": 0.3333333333333333,
+    "4": 0.5,
+    "5": 0.5,
+    "6": 1.0,
+    "7": 1.0,
+    "8": 1.0,
+    "9": 1.0
+  },
+  "gods": [
+    {
+      "id": "claude_md_repo_layout",
+      "label": "Repository Layout",
+      "degree": 10
+    },
+    {
+      "id": "claude_md_environments_hub_main",
+      "label": "environments/hub/main.tf Root Composition",
+      "degree": 10
+    },
+    {
+      "id": "claude_md_module_iam_boundaries",
+      "label": "modules/iam-boundaries Module",
+      "degree": 5
+    },
+    {
+      "id": "claude_md_module_security_baseline",
+      "label": "modules/security-baseline Module",
+      "degree": 5
+    },
+    {
+      "id": "claude_md_module_github_oidc",
+      "label": "modules/github-oidc Module",
+      "degree": 5
+    },
+    {
+      "id": "claude_md_caveats",
+      "label": "Known Caveats and Limitations",
+      "degree": 5
+    },
+    {
+      "id": "claude_md_module_logging",
+      "label": "modules/logging Module",
+      "degree": 4
+    },
+    {
+      "id": "oidc_role_assumption_concept",
+      "label": "GitHub OIDC Role Assumption Pattern",
+      "degree": 4
+    },
+    {
+      "id": "claude_md_module_vpc",
+      "label": "modules/vpc Module",
+      "degree": 3
+    },
+    {
+      "id": "claude_md_module_transit_gateway",
+      "label": "modules/transit-gateway Module",
+      "degree": 3
+    }
+  ],
+  "surprises": [
+    {
+      "source": "README Known Caveats",
+      "target": "Known Caveats and Limitations",
+      "source_files": [
+        "README.md",
+        "CLAUDE.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link; peripheral node `README Known Caveats` unexpectedly reaches hub `Known Caveats and Limitations`"
+    },
+    {
+      "source": "Personal AWS Landing Zone README Overview",
+      "target": "Landing Zone Architecture Overview",
+      "source_files": [
+        "README.md",
+        "CLAUDE.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+    },
+    {
+      "source": "README Architecture Diagram",
+      "target": "Hub-and-Spoke Network Topology",
+      "source_files": [
+        "README.md",
+        "CLAUDE.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "semantically_similar_to",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+    },
+    {
+      "source": "Repository Layout",
+      "target": "drift-detection GitHub Workflow",
+      "source_files": [
+        "CLAUDE.md",
+        "landing-zone/.github/workflows/drift-detection.yml"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "Repository Layout",
+      "target": "terraform-plan-apply GitHub Workflow",
+      "source_files": [
+        "CLAUDE.md",
+        "landing-zone/.github/workflows/terraform-plan-apply.yml"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `Repository Layout` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`?",
+      "why": "High betweenness centrality (0.191) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `drift-detection GitHub Workflow` connect `Community 3` to `Community 0`, `Community 1`?",
+      "why": "High betweenness centrality (0.140) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `01.setup_s3-backend.sh script`, `02.destroy-s3-backend.sh script`, `Enterprise Concept to Implementation Mapping` to the rest of the system?",
+      "why": "15 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}

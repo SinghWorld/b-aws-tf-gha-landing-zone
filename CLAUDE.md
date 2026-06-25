@@ -170,3 +170,13 @@ If you need to modify the OIDC role/trust policy itself, apply that change local
 - `landing-zone/environments/hub/outputs.tf` — what the root module exports (`github_actions_role_arn` is the one you paste into the GH secret)
 - `scripts/01.setup_s3-backend.sh` — first-run bootstrap
 - `scripts/02.destroy-s3-backend.sh` — full cleanup (handles Object Lock bypass)
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
