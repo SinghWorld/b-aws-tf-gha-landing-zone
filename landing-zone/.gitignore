@@ -55,4 +55,4 @@ terraform-ansible-cicd-guide.jsx.txt
 # Claud files
 .claud/
 .claud/*
-CLAUDE.md
+! CLAUDE.md
