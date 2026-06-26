@@ -10,6 +10,8 @@ trusted_principal_arns = [
   "arn:aws:iam::373160674113:user/Terraform"
 ]
 
+####################################
+
 # Must be globally unique across ALL of S3 - add your own suffix
 log_bucket_name = "balraj-personal-lab-log-archive-2026"
 
