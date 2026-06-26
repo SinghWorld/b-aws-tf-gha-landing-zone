@@ -41,44 +41,98 @@ if ! command -v aws &>/dev/null; then
   exit 1
 fi
 
-# ── Destroy Terraform infrastructure ───────────────────────────────────────
+# ── Destroy Terraform-managed bootstrap resources (OIDC module only) ───────
+# This script mirrors what 01.setup_s3-backend.sh creates via Terraform:
+# the github_oidc module (OIDC provider + role + PowerUserAccess attachment
+# + iam-management policy). We deliberately use a TARGETED destroy so the
+# landing zone infrastructure (VPCs, TGW, GuardDuty, etc.) is left intact
+# for the user's other lab work. To tear down the whole landing zone, run
+# `cd environments/hub && terraform destroy` manually.
 echo ""
-echo "🔨  Checking for Terraform infrastructure to destroy..."
+echo "🔨  Cleaning up bootstrap Terraform resources..."
 TF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../environments/hub"
-if [ -d "$TF_DIR" ] && [ -f "$TF_DIR/.terraform.lock.hcl" ]; then
-  echo "   Found Terraform in $TF_DIR"
+OIDC_RESOURCES_PRESENT=false
+if [ -d "$TF_DIR" ] && [ -f "$TF_DIR/.terraform.lock.hcl" ] && \
+   cd "$TF_DIR" && terraform state pull >/dev/null 2>&1; then
+  echo "   Found Terraform in $TF_DIR with accessible state."
 
-  # Check if state is accessible via the S3 backend
-  if cd "$TF_DIR" && terraform state pull >/dev/null 2>&1; then
-    echo "   Terraform state is accessible."
-    echo ""
-    echo "⚠️  This will destroy ALL Terraform-managed infrastructure:"
-    echo "   - Transit Gateway, VPCs, subnets, route tables"
-    echo "   - IAM boundaries, OIDC role, permission policies"
-    echo "   - Security tooling (GuardDuty, Security Hub, Config)"
-    echo "   - Logging (S3 buckets, CloudTrail)"
-    echo "   - Backup vault and plans"
-    echo ""
-    read -r -p "Destroy all Terraform infrastructure? (yes/no): " DESTROY_TF
-    if [ "$DESTROY_TF" = "yes" ]; then
-      echo ""
-      echo "📦  Running terraform destroy (this may take a while)..."
-      # Destroy all managed resources (including github_oidc module which creates the IAM OIDC role)
-      if terraform destroy -auto-approve 2>&1; then
-        echo "   ✅  Terraform destroy completed."
-      else
-        echo "   ⚠️  Terraform destroy had issues. Check output above."
-      fi
-    else
-      echo "   Skipping Terraform destroy."
+  # Check whether any of the github_oidc resources are tracked in state.
+  for RES in \
+    module.github_oidc.aws_iam_openid_connect_provider.github \
+    module.github_oidc.aws_iam_role.github_actions \
+    module.github_oidc.aws_iam_role_policy.iam_management \
+    module.github_oidc.aws_iam_role_policy_attachment.power_user; do
+    if terraform state list "$RES" >/dev/null 2>&1; then
+      OIDC_RESOURCES_PRESENT=true
+      break
     fi
-    cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+  done
+
+  if [ "$OIDC_RESOURCES_PRESENT" = true ]; then
+    echo "   Running targeted terraform destroy for github_oidc module..."
+    if terraform destroy -target module.github_oidc -auto-approve 2>&1; then
+      echo "   ✅  Targeted destroy completed."
+    else
+      echo "   ⚠️  Targeted destroy had issues. Will fall back to manual cleanup."
+    fi
   else
-    echo "   ℹ️  Cannot access Terraform state (bucket may be empty or inaccessible)."
-    echo "   Skipping Terraform destroy."
+    echo "   ℹ️  No github_oidc resources tracked in state — skipping targeted destroy."
+  fi
+
+  cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+else
+  echo "   ℹ️  No initialized Terraform state in $TF_DIR. Skipping targeted destroy."
+fi
+
+# ── Manual cleanup fallback for OIDC provider that survived in AWS ─────────
+# If the bootstrap (or a CI destroy that did `terraform state rm`) created
+# the OIDC provider in AWS but it's no longer in state, `terraform destroy
+# -target module.github_oidc` won't remove it. Check AWS directly and delete
+# any stragglers so the account is fully clean for a future re-bootstrap.
+echo ""
+echo "🧹  Checking AWS for any leftover OIDC resources..."
+EXISTING_OIDC_ARN=$(aws iam list-open-id-connect-providers \
+  --query "OpenIDConnectProviderList[?ends_with(Arn, 'token.actions.githubusercontent.com')].Arn" \
+  --output text 2>/dev/null || echo "")
+
+if [ -n "$EXISTING_OIDC_ARN" ]; then
+  # The role that trusts the provider must be deleted first; otherwise AWS
+  # refuses with `DeleteConflict`. Try to find it via the role name from
+  # the github-oidc module, and also list any role whose trust policy
+  # references the OIDC provider ARN as a fallback.
+  STUCK_ROLES=$(aws iam list-roles \
+    --query "Roles[?AssumeRolePolicyDocument.Statement[?Principal.Federated=='${EXISTING_OIDC_ARN}']].RoleName" \
+    --output text 2>/dev/null || echo "")
+  if [ -z "$STUCK_ROLES" ] || [ "$STUCK_ROLES" = "None" ]; then
+    STUCK_ROLES="github-actions-landing-zone-role"
+  fi
+
+  for ROLE_NAME in $STUCK_ROLES; do
+    if aws iam get-role --role-name "$ROLE_NAME" >/dev/null 2>&1; then
+      # Detach managed policies + delete inline policies so the role can be deleted.
+      for POLICY_ARN in $(aws iam list-attached-role-policies \
+          --role-name "$ROLE_NAME" --query 'AttachedPolicies[].PolicyArn' --output text 2>/dev/null); do
+        aws iam detach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN" 2>/dev/null || true
+      done
+      for POLICY_NAME in $(aws iam list-role-policies \
+          --role-name "$ROLE_NAME" --query 'PolicyNames[]' --output text 2>/dev/null); do
+        aws iam delete-role-policy --role-name "$ROLE_NAME" --policy-name "$POLICY_NAME" 2>/dev/null || true
+      done
+      if aws iam delete-role --role-name "$ROLE_NAME" 2>/dev/null; then
+        echo "   ✅  Deleted role: $ROLE_NAME"
+      else
+        echo "   ⚠️  Could not delete role $ROLE_NAME (continuing)."
+      fi
+    fi
+  done
+
+  if aws iam delete-open-id-connect-provider --open-id-connect-provider-arn "$EXISTING_OIDC_ARN" 2>/dev/null; then
+    echo "   ✅  Deleted OIDC provider: $EXISTING_OIDC_ARN"
+  else
+    echo "   ⚠️  Could not delete OIDC provider $EXISTING_OIDC_ARN (continuing)."
   fi
 else
-  echo "   ℹ️  No Terraform initialized in $TF_DIR. Skipping."
+  echo "   ℹ️  No leftover OIDC provider in AWS."
 fi
 
 # ── Check if bucket exists ──────────────────────────────────────────────────
@@ -269,11 +323,16 @@ fi
 echo ""
 echo "🗑️  Cleaning up GitHub environments..."
 if command -v gh &>/dev/null && gh auth status &>/dev/null; then
-  echo "   Checking GitHub environments for $GITHUB_ORG/$GITHUB_REPO..."
-
-  ENV_CHECK=$(gh api repos/"$GITHUB_ORG/$GITHUB_REPO"/environments/production -X DELETE 2>&1 || true)
-  # Note: DELETE on a non-existent environment returns 204 if it existed
-  echo "   ✅ Deleted environment: production"
+  # GET first so we can distinguish "didn't exist" from "delete failed".
+  if gh api "repos/$GITHUB_ORG/$GITHUB_REPO/environments/production" >/dev/null 2>&1; then
+    if gh api "repos/$GITHUB_ORG/$GITHUB_REPO/environments/production" -X DELETE >/dev/null 2>&1; then
+      echo "   ✅ Deleted environment: production"
+    else
+      echo "   ⚠️  Could not delete production environment (check repo permissions)."
+    fi
+  else
+    echo "   ℹ️  Environment 'production' does not exist — nothing to delete."
+  fi
 else
   echo "   ℹ️  GitHub CLI not available. Skipping environment cleanup."
 fi

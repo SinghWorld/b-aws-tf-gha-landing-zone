@@ -45,7 +45,7 @@ TF_VERSIONS_FILE="$SCRIPT_DIR/../environments/hub/versions.tf"
 mkdir -p "$(dirname "$TF_VERSIONS_FILE")"
 cat > "$TF_VERSIONS_FILE" <<EOF
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.11.0"
 
   required_providers {
     aws = {
@@ -155,6 +155,28 @@ if command -v terraform &>/dev/null && [ -f "$TF_DIR/.terraform.lock.hcl" ]; the
 
   # Check if state bucket is accessible
   if terraform state pull >/dev/null 2>&1; then
+    # AWS only allows ONE OIDC provider per unique issuer URL per account. If
+    # a previous run (local apply or a CI destroy that did `terraform state
+    # rm`) already created the provider in AWS, `terraform apply` will fail
+    # with `EntityAlreadyExists`. Detect this and `terraform import` the
+    # existing provider into state so the targeted apply becomes idempotent.
+    EXISTING_OIDC_ARN=$(aws iam list-open-id-connect-providers \
+      --query "OpenIDConnectProviderList[?ends_with(Arn, 'token.actions.githubusercontent.com')].Arn" \
+      --output text 2>/dev/null || echo "")
+
+    if [ -n "$EXISTING_OIDC_ARN" ]; then
+      # Only import if NOT already tracked in state (otherwise `terraform
+      # import` errors out, which would be confusing on a clean re-run).
+      if terraform state list module.github_oidc.aws_iam_openid_connect_provider.github >/dev/null 2>&1; then
+        echo "   ℹ️  OIDC provider already in state — nothing to import."
+      else
+        echo "   ℹ️  OIDC provider already exists in AWS ($EXISTING_OIDC_ARN)."
+        echo "   Importing into state so the targeted apply is idempotent..."
+        terraform import module.github_oidc.aws_iam_openid_connect_provider.github "$EXISTING_OIDC_ARN" \
+          || echo "   ⚠️  Import failed (continuing — apply will report the actual error)."
+      fi
+    fi
+
     echo "   Running targeted terraform apply for github_oidc module..."
     terraform apply -target module.github_oidc -auto-approve 2>&1 || true
 
@@ -162,7 +184,7 @@ if command -v terraform &>/dev/null && [ -f "$TF_DIR/.terraform.lock.hcl" ]; the
     GITHUB_OIDC_ROLE_ARN=$(terraform output -raw github_actions_role_arn 2>/dev/null || echo "")
 
     if [ -n "$GITHUB_OIDC_ROLE_ARN" ]; then
-      echo "   ✅  OIDC role created: $GITHUB_OIDC_ROLE_ARN"
+      echo "   ✅  OIDC role ready: $GITHUB_OIDC_ROLE_ARN"
     else
       echo "   ⚠️  Could not get OIDC role ARN from terraform output."
       echo "   It will be available after full terraform apply."
