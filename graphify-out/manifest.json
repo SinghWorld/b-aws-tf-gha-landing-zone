@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   ".claude/settings.local.json": {
-    "mtime": 1782368488.6061273,
-    "ast_hash": "7dcf254d7c0c87464e9ccaac8099038a",
+    "mtime": 1782372794.3895137,
+    "ast_hash": "44d5ad86ab1a46ef91008ebf1aededa4",
     "semantic_hash": ""
   },
   "landing-zone/.claude/settings.local.json": {
@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "landing-zone/environments/hub/main.tf": {
-    "mtime": 1782128959.3543756,
-    "ast_hash": "d4097ecbbf6e4ae68a0d9a993cf8f58d",
+    "mtime": 1782438022.3700526,
+    "ast_hash": "b6cca5a10d577746efeae3c64fc97076",
     "semantic_hash": ""
   },
   "landing-zone/environments/hub/outputs.tf": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "landing-zone/modules/logging/main.tf": {
-    "mtime": 1782129953.9044719,
-    "ast_hash": "59d56d9f0132f1cf7345c396fe4ba7ca",
+    "mtime": 1782438022.3780527,
+    "ast_hash": "d7edbb5c952bbe11e3e922311c7258e4",
     "semantic_hash": ""
   },
   "landing-zone/modules/logging/outputs.tf": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "landing-zone/modules/transit-gateway/main.tf": {
-    "mtime": 1782127673.8299038,
-    "ast_hash": "b40e9064af0170c644f5ef3c70dc6bee",
+    "mtime": 1782438022.382053,
+    "ast_hash": "63d3409c8fb94d923428bcdeb1f76aff",
     "semantic_hash": ""
   },
   "landing-zone/modules/transit-gateway/outputs.tf": {
@@ -125,8 +125,8 @@
     "semantic_hash": ""
   },
   "landing-zone/modules/vpc/main.tf": {
-    "mtime": 1782103961.0,
-    "ast_hash": "4074aba752fd0ba704c6d684362983b6",
+    "mtime": 1782438022.3840528,
+    "ast_hash": "27672c31a559febb2d0b54443a2530bd",
     "semantic_hash": ""
   },
   "landing-zone/modules/vpc/outputs.tf": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1782368488.720132,
-    "ast_hash": "6d33e7331918a1d0cf839efdb0397e5c",
+    "mtime": 1782437469.7766867,
+    "ast_hash": "0d28b58b2c585e5b9adcbf9c4b2abc2d",
     "semantic_hash": ""
   },
   "README.md": {

@@ -59,7 +59,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "claude",
-      "community": 8,
+      "community": 14,
       "norm_label": "claude.md"
     },
     {
@@ -249,7 +249,7 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "claude_ci_cd_workflows",
-      "community": 11,
+      "community": 8,
       "norm_label": "ci/cd workflows"
     },
     {
@@ -259,7 +259,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "claude_github_workflows_terraform_plan_apply_yml",
-      "community": 11,
+      "community": 8,
       "norm_label": "`.github/workflows/terraform-plan-apply.yml`"
     },
     {
@@ -269,7 +269,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "claude_github_workflows_drift_detection_yml",
-      "community": 11,
+      "community": 8,
       "norm_label": "`.github/workflows/drift-detection.yml`"
     },
     {
@@ -301,6 +301,146 @@
       "id": "claude_graphify",
       "community": 8,
       "norm_label": "graphify"
+    },
+    {
+      "label": "AWS Terraform Infrastructure Resource Summary",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L186",
+      "_origin": "ast",
+      "id": "claude_aws_terraform_infrastructure_resource_summary",
+      "community": 11,
+      "norm_label": "aws terraform infrastructure resource summary"
+    },
+    {
+      "label": "Resource Inventory",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L188",
+      "_origin": "ast",
+      "id": "claude_resource_inventory",
+      "community": 11,
+      "norm_label": "resource inventory"
+    },
+    {
+      "label": "Spoke VPCs (4 \u00d7 Dev, Test, Prod, Shared)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L206",
+      "_origin": "ast",
+      "id": "claude_spoke_vpcs_4_dev_test_prod_shared",
+      "community": 11,
+      "norm_label": "spoke vpcs (4 \u00d7 dev, test, prod, shared)"
+    },
+    {
+      "label": "Per Spoke",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L208",
+      "_origin": "ast",
+      "id": "claude_per_spoke",
+      "community": 11,
+      "norm_label": "per spoke"
+    },
+    {
+      "label": "Transit Gateway",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L223",
+      "_origin": "ast",
+      "id": "claude_transit_gateway",
+      "community": 11,
+      "norm_label": "transit gateway"
+    },
+    {
+      "label": "IAM Boundaries",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L237",
+      "_origin": "ast",
+      "id": "claude_iam_boundaries",
+      "community": 11,
+      "norm_label": "iam boundaries"
+    },
+    {
+      "label": "Logging",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L251",
+      "_origin": "ast",
+      "id": "claude_logging",
+      "community": 11,
+      "norm_label": "logging"
+    },
+    {
+      "label": "Security Baseline",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L277",
+      "_origin": "ast",
+      "id": "claude_security_baseline",
+      "community": 11,
+      "norm_label": "security baseline"
+    },
+    {
+      "label": "AWS Backup",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L291",
+      "_origin": "ast",
+      "id": "claude_aws_backup",
+      "community": 11,
+      "norm_label": "aws backup"
+    },
+    {
+      "label": "GitHub OIDC Integration",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L305",
+      "_origin": "ast",
+      "id": "claude_github_oidc_integration",
+      "community": 11,
+      "norm_label": "github oidc integration"
+    },
+    {
+      "label": "Overall Summary",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L318",
+      "_origin": "ast",
+      "id": "claude_overall_summary",
+      "community": 14,
+      "norm_label": "overall summary"
+    },
+    {
+      "label": "Observations",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L334",
+      "_origin": "ast",
+      "id": "claude_observations",
+      "community": 14,
+      "norm_label": "observations"
+    },
+    {
+      "label": "Good Practices",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L336",
+      "_origin": "ast",
+      "id": "claude_good_practices",
+      "community": 14,
+      "norm_label": "good practices"
+    },
+    {
+      "label": "Improvements Required",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "L349",
+      "_origin": "ast",
+      "id": "claude_improvements_required",
+      "community": 14,
+      "norm_label": "improvements required"
     },
     {
       "label": "01.setup_s3-backend.sh",
@@ -572,10 +712,40 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CLAUDE.md",
-      "source_location": "L1",
+      "source_location": "L186",
       "weight": 1.0,
       "source": "claude",
-      "target": "claude_claude_md",
+      "target": "claude_aws_terraform_infrastructure_resource_summary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "claude",
+      "target": "claude_claude_md"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L334",
+      "weight": 1.0,
+      "source": "claude",
+      "target": "claude_observations",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L318",
+      "weight": 1.0,
+      "source": "claude",
+      "target": "claude_overall_summary",
       "confidence_score": 1.0
     },
     {
@@ -584,9 +754,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_architecture_overview",
-      "confidence_score": 1.0
+      "target": "claude_architecture_overview"
     },
     {
       "relation": "contains",
@@ -594,9 +764,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L132",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_bootstrap_process_chicken_and_egg",
-      "confidence_score": 1.0
+      "target": "claude_bootstrap_process_chicken_and_egg"
     },
     {
       "relation": "contains",
@@ -604,9 +774,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L156",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_caveats",
-      "confidence_score": 1.0
+      "target": "claude_caveats"
     },
     {
       "relation": "contains",
@@ -614,9 +784,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_ci_cd_workflows",
-      "confidence_score": 1.0
+      "target": "claude_ci_cd_workflows"
     },
     {
       "relation": "contains",
@@ -624,9 +794,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_common_commands",
-      "confidence_score": 1.0
+      "target": "claude_common_commands"
     },
     {
       "relation": "contains",
@@ -634,9 +804,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L174",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_graphify",
-      "confidence_score": 1.0
+      "target": "claude_graphify"
     },
     {
       "relation": "contains",
@@ -644,9 +814,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_key_cross_module_wiring",
-      "confidence_score": 1.0
+      "target": "claude_key_cross_module_wiring"
     },
     {
       "relation": "contains",
@@ -654,9 +824,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_module_reference",
-      "confidence_score": 1.0
+      "target": "claude_module_reference"
     },
     {
       "relation": "contains",
@@ -664,9 +834,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L167",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_claude_md",
-      "target": "claude_useful_pointers",
-      "confidence_score": 1.0
+      "target": "claude_useful_pointers"
     },
     {
       "relation": "contains",
@@ -674,9 +844,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_architecture_overview",
-      "target": "claude_hub_and_spoke_network_topology",
-      "confidence_score": 1.0
+      "target": "claude_hub_and_spoke_network_topology"
     },
     {
       "relation": "contains",
@@ -684,9 +854,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_architecture_overview",
-      "target": "claude_key_configuration_details",
-      "confidence_score": 1.0
+      "target": "claude_key_configuration_details"
     },
     {
       "relation": "contains",
@@ -694,9 +864,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_architecture_overview",
-      "target": "claude_module_boundaries_enterprise_concept_analogy",
-      "confidence_score": 1.0
+      "target": "claude_module_boundaries_enterprise_concept_analogy"
     },
     {
       "relation": "contains",
@@ -704,9 +874,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_architecture_overview",
-      "target": "claude_repo_layout",
-      "confidence_score": 1.0
+      "target": "claude_repo_layout"
     },
     {
       "relation": "contains",
@@ -714,9 +884,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_environments_hub_main_tf",
-      "confidence_score": 1.0
+      "target": "claude_environments_hub_main_tf"
     },
     {
       "relation": "contains",
@@ -724,9 +894,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L117",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_backup",
-      "confidence_score": 1.0
+      "target": "claude_modules_backup"
     },
     {
       "relation": "contains",
@@ -734,9 +904,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L120",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_github_oidc",
-      "confidence_score": 1.0
+      "target": "claude_modules_github_oidc"
     },
     {
       "relation": "contains",
@@ -744,9 +914,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L108",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_iam_boundaries",
-      "confidence_score": 1.0
+      "target": "claude_modules_iam_boundaries"
     },
     {
       "relation": "contains",
@@ -754,9 +924,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_logging",
-      "confidence_score": 1.0
+      "target": "claude_modules_logging"
     },
     {
       "relation": "contains",
@@ -764,9 +934,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L114",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_security_baseline",
-      "confidence_score": 1.0
+      "target": "claude_modules_security_baseline"
     },
     {
       "relation": "contains",
@@ -774,9 +944,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_transit_gateway",
-      "confidence_score": 1.0
+      "target": "claude_modules_transit_gateway"
     },
     {
       "relation": "contains",
@@ -784,9 +954,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L102",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_module_reference",
-      "target": "claude_modules_vpc",
-      "confidence_score": 1.0
+      "target": "claude_modules_vpc"
     },
     {
       "relation": "contains",
@@ -794,9 +964,9 @@
       "source_file": "CLAUDE.md",
       "source_location": "L151",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_ci_cd_workflows",
-      "target": "claude_github_workflows_drift_detection_yml",
-      "confidence_score": 1.0
+      "target": "claude_github_workflows_drift_detection_yml"
     },
     {
       "relation": "contains",
@@ -804,8 +974,118 @@
       "source_file": "CLAUDE.md",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "claude_ci_cd_workflows",
-      "target": "claude_github_workflows_terraform_plan_apply_yml",
+      "target": "claude_github_workflows_terraform_plan_apply_yml"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L291",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_aws_backup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L305",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_github_oidc_integration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_iam_boundaries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L251",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_logging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L188",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_resource_inventory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L277",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_security_baseline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L206",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_spoke_vpcs_4_dev_test_prod_shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L223",
+      "weight": 1.0,
+      "source": "claude_aws_terraform_infrastructure_resource_summary",
+      "target": "claude_transit_gateway",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "claude_spoke_vpcs_4_dev_test_prod_shared",
+      "target": "claude_per_spoke",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L336",
+      "weight": 1.0,
+      "source": "claude_observations",
+      "target": "claude_good_practices",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L349",
+      "weight": 1.0,
+      "source": "claude_observations",
+      "target": "claude_improvements_required",
       "confidence_score": 1.0
     },
     {
@@ -957,5 +1237,5 @@
       "source_file": "CLAUDE.md"
     }
   ],
-  "built_at_commit": "76360d9b77ca7b4ee6f97033e6c1fb5c85ee086c"
+  "built_at_commit": "7f805d770bb5a37853624a96b02f316305833352"
 }
