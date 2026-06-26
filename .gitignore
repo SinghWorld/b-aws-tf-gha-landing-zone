@@ -85,5 +85,6 @@ node_modules/
 dist/
 *.generated.py
 
+# Graphify output folder ignore
 graphify-out/
 graphify-out/*
