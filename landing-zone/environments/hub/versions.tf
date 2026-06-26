@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.11.0"  # use_lockfile (S3 native state locking) became GA in 1.11.0
 
   required_providers {
     aws = {

@@ -33,6 +33,14 @@ tfplan.binary
 drift.tfplan
 .DS_Store
 
+
+# ignore all .env files
+.env
+
+# ignore .claude
+.claude
+.claude/*
+
 # Terraform
 backend.tf
 .terraform/
