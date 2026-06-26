@@ -73,23 +73,41 @@ module "transit_gateway" {
     shared = { vpc_id = module.shared_services_vpc.vpc_id, subnet_ids = module.shared_services_vpc.private_subnet_ids }
   }
 
-  # Spokes send all egress traffic to the hub via TGW (hub then has the IGW/NAT/firewall)
-  spoke_route_table_ids = {
-    dev    = module.dev_vpc.private_route_table_ids
-    test   = module.test_vpc.private_route_table_ids
-    prod   = module.prod_vpc.private_route_table_ids
-    shared = module.shared_services_vpc.private_route_table_ids
+}
+
+
+
+# ---------- Routes: spokes <-> hub via TGW ----------
+# Spokes have no NAT of their own; their private route tables send 0.0.0.0/0 to
+# the TGW. The TGW route table has a default route pointing at the hub
+# (see modules/transit-gateway/main.tf), so all non-VPC-bound spoke traffic
+# lands on the hub, hits NAT, and goes out to the internet.
+# The hub's private route table already has 0.0.0.0/0 -> NAT (from the VPC
+# module), so we only need to add explicit spoke CIDR routes pointing back
+# into the TGW for return traffic from NAT to reach the originating spoke.
+
+resource "aws_route" "spoke_default_to_tgw" {
+  for_each = {
+    dev    = module.dev_vpc.private_route_table_ids[0]
+    test   = module.test_vpc.private_route_table_ids[0]
+    prod   = module.prod_vpc.private_route_table_ids[0]
+    shared = module.shared_services_vpc.private_route_table_ids[0]
   }
+  route_table_id         = each.value
+  destination_cidr_block = "0.0.0.0/0"
+  transit_gateway_id     = module.transit_gateway.tgw_id
+}
 
-  # Hub needs explicit routes back to each spoke CIDR
-  hub_route_table_ids = module.hub_vpc.private_route_table_ids
-
-  spoke_cidrs = {
+resource "aws_route" "hub_to_spokes" {
+  for_each = {
     dev    = module.dev_vpc.vpc_cidr
     test   = module.test_vpc.vpc_cidr
     prod   = module.prod_vpc.vpc_cidr
     shared = module.shared_services_vpc.vpc_cidr
   }
+  route_table_id         = module.hub_vpc.private_route_table_ids[0]
+  destination_cidr_block = each.value
+  transit_gateway_id     = module.transit_gateway.tgw_id
 }
 
 # ---------- IAM permission boundaries (SCP equivalent for single account) ----------
@@ -113,7 +131,7 @@ module "security_baseline" {
   source = "../../modules/security-baseline"
 
   config_recorder_name = module.logging.config_recorder_name
-  delivery_s3_bucket    = module.logging.log_bucket_name
+  delivery_s3_bucket   = module.logging.log_bucket_name
 }
 
 # ---------- Backup (reliability) ----------

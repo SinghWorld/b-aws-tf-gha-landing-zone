@@ -41,26 +41,45 @@ if ! command -v aws &>/dev/null; then
   exit 1
 fi
 
-# # ── Destroy Terraform infrastructure if it exists ──────────────────────────
-# echo "🔨  Checking for Terraform state..."
-# TF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../environments/hub"
-# if [ -d "$TF_DIR" ] && [ -f "$TF_DIR/.terraform.lock.hcl" ]; then
-#   echo "   Found Terraform state in $TF_DIR"
-#   read -r -p "   Destroy Terraform infrastructure first? (yes/no): " DESTROY_TF
-#   if [ "$DESTROY_TF" = "yes" ]; then
-#     echo ""
-#     echo "📦  Running terraform destroy in $TF_DIR..."
-#     cd "$TF_DIR"
-#     # Check if backend is configured
-#     if terraform state pull >/dev/null 2>&1; then
-#       echo "   Destroying infrastructure (this may take a while)..."
-#       terraform destroy -auto-approve 2>&1 || echo "   ⚠️  Terraform destroy had issues. Check output above."
-#     else
-#       echo "   ℹ️  No Terraform state to destroy (or state is empty)."
-#     fi
-#     echo ""
-#   fi
-# fi
+# ── Destroy Terraform infrastructure ───────────────────────────────────────
+echo ""
+echo "🔨  Checking for Terraform infrastructure to destroy..."
+TF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../environments/hub"
+if [ -d "$TF_DIR" ] && [ -f "$TF_DIR/.terraform.lock.hcl" ]; then
+  echo "   Found Terraform in $TF_DIR"
+
+  # Check if state is accessible via the S3 backend
+  if cd "$TF_DIR" && terraform state pull >/dev/null 2>&1; then
+    echo "   Terraform state is accessible."
+    echo ""
+    echo "⚠️  This will destroy ALL Terraform-managed infrastructure:"
+    echo "   - Transit Gateway, VPCs, subnets, route tables"
+    echo "   - IAM boundaries, OIDC role, permission policies"
+    echo "   - Security tooling (GuardDuty, Security Hub, Config)"
+    echo "   - Logging (S3 buckets, CloudTrail)"
+    echo "   - Backup vault and plans"
+    echo ""
+    read -r -p "Destroy all Terraform infrastructure? (yes/no): " DESTROY_TF
+    if [ "$DESTROY_TF" = "yes" ]; then
+      echo ""
+      echo "📦  Running terraform destroy (this may take a while)..."
+      # Destroy all managed resources (including github_oidc module which creates the IAM OIDC role)
+      if terraform destroy -auto-approve 2>&1; then
+        echo "   ✅  Terraform destroy completed."
+      else
+        echo "   ⚠️  Terraform destroy had issues. Check output above."
+      fi
+    else
+      echo "   Skipping Terraform destroy."
+    fi
+    cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+  else
+    echo "   ℹ️  Cannot access Terraform state (bucket may be empty or inaccessible)."
+    echo "   Skipping Terraform destroy."
+  fi
+else
+  echo "   ℹ️  No Terraform initialized in $TF_DIR. Skipping."
+fi
 
 # ── Check if bucket exists ──────────────────────────────────────────────────
 echo "🔍  Checking if bucket '$BUCKET_NAME' exists..."
@@ -270,7 +289,7 @@ echo "  - GitHub secret: TF_VAR_tf_state_bucket"
 echo "  - GitHub secret: AWS_GITHUB_OIDC_ROLE_ARN"
 echo "  - GitHub environment: production"
 echo ""
-echo "Note: The OIDC role 'github-actions-landing-zone-role' in AWS IAM"
-echo "      was not deleted (managed by Terraform). Run 'terraform destroy'"
-echo "      to remove it, or manually delete via AWS Console."
+echo "Note: If you chose 'yes' above, the OIDC role and all other Terraform-"
+echo "      managed AWS resources have been destroyed by 'terraform destroy'."
+echo "      The S3 bucket containing Terraform state has also been deleted."
 echo ""

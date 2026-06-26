@@ -20,27 +20,9 @@ variable "vpc_attachments" {
 }
 
 variable "hub_key" {
-  description = "Key (within vpc_attachments) identifying the hub VPC, used to build the default route in spokes"
+  description = "Key (within vpc_attachments) identifying the hub VPC"
   type        = string
   default     = "hub"
-}
-
-variable "spoke_route_table_ids" {
-  description = "Map of spoke environment key => list of private route table IDs that need a default route pointed at the TGW (for hub-and-spoke egress via firewall/NAT in the hub)"
-  type        = map(list(string))
-  default     = {}
-}
-
-variable "spoke_cidrs" {
-  description = "Map of spoke environment key => VPC CIDR, used to add routes from the hub VPC route table back to each spoke"
-  type        = map(string)
-  default     = {}
-}
-
-variable "hub_route_table_ids" {
-  description = "List of hub VPC private route table IDs that need routes to each spoke CIDR via the TGW"
-  type        = list(string)
-  default     = []
 }
 
 variable "tags" {

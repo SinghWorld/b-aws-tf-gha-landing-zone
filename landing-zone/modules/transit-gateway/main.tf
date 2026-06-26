@@ -9,8 +9,8 @@ locals {
 }
 
 resource "aws_ec2_transit_gateway" "this" {
-  description                    = "${var.name} - hub-and-spoke TGW for personal lab landing zone"
-  amazon_side_asn                = var.amazon_side_asn
+  description                     = "${var.name} - hub-and-spoke TGW for personal lab landing zone"
+  amazon_side_asn                 = var.amazon_side_asn
   auto_accept_shared_attachments  = "disable"
   default_route_table_association = "disable"
   default_route_table_propagation = "disable"
@@ -61,39 +61,17 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "this" {
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
 }
 
-# ---------- Spoke VPC route tables: send 0.0.0.0/0 (or hub CIDR) via TGW ----------
-# This routes spoke egress traffic to the hub (for centralized firewall/NAT inspection).
-# For_each uses static keys (spoke names) so plan is deterministic;
-# route_table_id values are resolved at apply time once VPC module outputs are available.
-resource "aws_route" "spoke_to_hub" {
-  for_each = var.spoke_route_table_ids
-
-  route_table_id         = each.value
-  destination_cidr_block = "0.0.0.0/0"
-  transit_gateway_id     = aws_ec2_transit_gateway.this.id
-
-  depends_on = [
-    aws_ec2_transit_gateway_vpc_attachment.this,
-    aws_ec2_transit_gateway_route_table_propagation.this,
-  ]
+# ---------- Default route on the shared TGW route table → hub attachment ----------
+# Without this, any traffic sent to the TGW that does not match a more-specific
+# propagated CIDR (e.g. a spoke's 0.0.0.0/0 default route heading for the internet)
+# has nowhere to go and is dropped. Pinning 0.0.0.0/0 to the hub forces all
+# non-VPC-bound traffic to traverse the hub, which is where NAT lives.
+# More-specific VPC CIDRs from propagation win over this default for inter-VPC
+# traffic, so spoke-to-spoke still works directly.
+resource "aws_ec2_transit_gateway_route" "default_to_hub" {
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.this[var.hub_key].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.this.id
 }
 
-# ---------- Hub VPC route tables: explicit routes back to each spoke CIDR via TGW ----------
-resource "aws_route" "hub_to_spokes" {
-  for_each = {
-    for rt_id in var.hub_route_table_ids :
-    rt_id => {
-      for spoke_key, cidr in var.spoke_cidrs :
-      spoke_key => cidr
-    }
-  }
 
-  route_table_id         = each.key
-  destination_cidr_block = each.value
-  transit_gateway_id     = aws_ec2_transit_gateway.this.id
-
-  depends_on = [
-    aws_ec2_transit_gateway_vpc_attachment.this,
-    aws_ec2_transit_gateway_route_table_propagation.this,
-  ]
-}

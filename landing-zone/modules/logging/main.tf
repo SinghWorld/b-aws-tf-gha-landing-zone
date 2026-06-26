@@ -36,7 +36,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_archive" {
   bucket = aws_s3_bucket.log_archive.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      sse_algorithm = "aws:kms" # Uses AWS-managed aws/s3 CMK; Config delivery can work with this
     }
     bucket_key_enabled = true
   }
@@ -80,6 +80,10 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     }
     actions   = ["s3:GetBucketAcl"]
     resources = [aws_s3_bucket.log_archive.arn]
+    # NOTE: s3:x-amz-acl condition is NOT applied to GetBucketAcl because AWS
+    # rejects it as incompatible with this action+resource combination. CloudTrail
+    # writes objects with bucket-owner-full-control ACL via the PutObject statement
+    # below, which is where the condition is enforced.
   }
 
   statement {
@@ -99,8 +103,35 @@ data "aws_iam_policy_document" "log_bucket_policy" {
   }
 
   statement {
-    sid       = "DenyObjectDeletion"
-    effect    = "Deny"
+    sid    = "AWSConfigWrite"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["config.amazonaws.com"]
+    }
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.log_archive.arn}/AWSLogs/${var.account_id}/Config/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
+    sid    = "AWSConfigRead"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["config.amazonaws.com"]
+    }
+    actions   = ["s3:GetBucketAcl", "s3:ListBucket"]
+    resources = [aws_s3_bucket.log_archive.arn]
+  }
+
+  statement {
+    sid    = "DenyObjectDeletion"
+    effect = "Deny"
     principals {
       type        = "AWS"
       identifiers = ["*"]
@@ -166,15 +197,10 @@ resource "aws_iam_role_policy_attachment" "config_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
 }
 
-resource "aws_s3_bucket_policy" "log_archive_config_addendum" {
-  # Config also needs to write to the same bucket - handled via a separate
-  # statement merge would be cleaner, but for lab simplicity Config gets its
-  # own prefix permission appended through this dependent resource ordering.
-  bucket     = aws_s3_bucket.log_archive.id
-  policy     = data.aws_iam_policy_document.log_bucket_policy.json
-  depends_on = [aws_cloudtrail.this]
-}
-
+# NOTE: AWS allows only one bucket policy per S3 bucket. The Config write/read
+# permissions are already declared in `data.aws_iam_policy_document.log_bucket_policy`
+# (statements `AWSConfigWrite` and `AWSConfigRead`), so a single
+# `aws_s3_bucket_policy` above is sufficient — no separate "addendum" needed.
 resource "aws_config_configuration_recorder" "this" {
   name     = "personal-lab-recorder"
   role_arn = aws_iam_role.config_role.arn
@@ -189,7 +215,9 @@ resource "aws_config_delivery_channel" "this" {
   name           = "personal-lab-delivery-channel"
   s3_bucket_name = aws_s3_bucket.log_archive.id
   s3_key_prefix  = "config"
-
+  # s3_kms_key_arn intentionally omitted — bucket uses SSE-KMS with alias/aws/s3.
+  # Config service delivers using its own service-linked key for cross-account/cross-region
+  # writes; explicit s3_kms_key_arn conflicts with how the delivery channel resolves keys.
   depends_on = [aws_config_configuration_recorder.this]
 }
 
