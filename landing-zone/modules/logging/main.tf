@@ -15,14 +15,16 @@ locals {
   config_prefix     = "config"
 }
 
-# AWS-managed CMK used by the bucket's SSE-KMS encryption. The Config delivery
-# channel requires this ARN explicitly when the destination bucket uses
-# SSE-KMS - it cannot infer it from the bucket (see AWS docs:
+# SSE uses S3-managed keys (AES256) rather than SSE-KMS. The AWS-managed
+# alias/aws/s3 CMK was the previous choice, but its fixed key policy does
+# NOT grant the Config service principal kms:Encrypt/Decrypt/GenerateDataKey,
+# which PutDeliveryChannel requires - it fails with
+# InsufficientDeliveryPolicyException at apply time (see
 # https://docs.aws.amazon.com/config/latest/developerguide/s3-kms-key.html).
-data "aws_kms_alias" "s3" {
-  name = "alias/aws/s3"
-}
-
+# Customer-managed CMK would also work but adds a new resource, key policy,
+# alias, rotation, and $1/key/month cost for a single-account lab. SSE-S3 is
+# free, requires no key policy for the producer service principals, and keeps
+# every other hardening (versioning, PAB, deny-delete, lifecycle, deny-insecure-transport).
 # ---------- Centralized log bucket (Log Archive account equivalent) ----------
 resource "aws_s3_bucket" "log_archive" {
   bucket = var.log_bucket_name
@@ -51,9 +53,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_archive" {
   bucket = aws_s3_bucket.log_archive.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms" # Uses AWS-managed aws/s3 CMK; Config delivery can work with this
+      sse_algorithm = "AES256"
     }
-    bucket_key_enabled = true
   }
 }
 
@@ -230,12 +231,10 @@ resource "aws_config_delivery_channel" "this" {
   name           = "personal-lab-delivery-channel"
   s3_bucket_name = aws_s3_bucket.log_archive.id
   s3_key_prefix  = local.config_prefix
-  # Required when the destination bucket uses SSE-KMS. Without this, Config
-  # returns InsufficientDeliveryPolicyException with "provided kms key is
-  # 'null'". Using the AWS-managed aws/s3 alias here because the bucket's
-  # SSE-KMS configuration also defaults to aws/s3 - keeping the two aligned
-  # avoids any cross-key permission headaches.
-  s3_kms_key_arn = data.aws_kms_alias.s3.arn
+  # s3_kms_key_arn intentionally omitted: the destination bucket uses SSE-S3
+  # (AES256), so Config does not need any KMS permissions to deliver objects.
+  # (Setting s3_kms_key_arn here would also require the key policy to grant
+  # Config kms:Encrypt - which the AWS-managed aws/s3 key cannot do.)
 
   depends_on = [aws_config_configuration_recorder.this]
 }
