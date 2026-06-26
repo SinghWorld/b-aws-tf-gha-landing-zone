@@ -27,10 +27,11 @@ accounts) without the cost or complexity of running multiple accounts.
 |---|---|
 | Network Hub account | Hub VPC with IGW/NAT, all spoke egress routes through it via TGW |
 | Log Archive account | Centralized S3 bucket, versioned, delete-denied, CloudTrail + Config delivery |
-| Audit/Security account | GuardDuty + Security Hub + CIS conformance pack, all in this account |
-| SCPs at OU level | IAM permission boundaries per environment (dev/test/prod) |
+| Audit/Security account | GuardDuty + Security Hub with CIS Foundations v3.0.0 standard subscription. CIS Conformance Pack is NOT deployed by Terraform (see caveats) |
+| SCPs at OU level | IAM permission boundaries per environment (dev/test/prod), with explicit `DenyOutsideHomeRegion`, `DenyCrossEnvironmentAccess`, and `DenyDisablingSecurityTooling` statements |
 | Workload accounts | Dev/Test/Prod VPCs, isolated by tag-enforced IAM boundary + route tables |
 | AWS Backup org policy | Tag-based backup plan/selection on `Environment=prod` resources |
+| CI/CD via OIDC | GitHub Actions assumes a dedicated IAM role via OIDC (no long-lived keys), with `PowerUserAccess` plus a scoped IAM-management policy |
 
 ## Repo layout
 
@@ -41,11 +42,18 @@ landing-zone/
 │   ├── transit-gateway/     # TGW + attachments + route propagation
 │   ├── iam-boundaries/      # permission boundary + assumable role per env
 │   ├── logging/             # S3 log bucket + CloudTrail + Config recorder
-│   ├── security-baseline/   # GuardDuty + Security Hub + conformance pack
-│   └── backup/              # AWS Backup plan, tag-based selection
+│   ├── security-baseline/   # GuardDuty + Security Hub (CIS standards sub)
+│   ├── backup/              # AWS Backup plan, tag-based selection
+│   └── github-oidc/         # GitHub OIDC provider + CI assume role
 ├── environments/
 │   └── hub/                 # root module - the only one you `terraform apply`
-└── .github/workflows/       # plan/apply + drift detection (OIDC auth)
+├── scripts/
+│   ├── 01.setup_s3-backend.sh   # one-shot bootstrap (bucket + secrets + OIDC role)
+│   └── 02.destroy-s3-backend.sh # full teardown (OIDC module + bucket + GH bits)
+└── .github/workflows/
+    ├── terraform-plan-apply.yml # PR → plan; push to main → apply (env-gated)
+    ├── drift-detection.yml      # daily plan; opens GH Issue on drift
+    └── destroy.yml              # manual workflow_dispatch; state-rm OIDC then destroy
 ```
 
 Only `environments/hub` is a root module in this single-account design —
@@ -55,101 +63,171 @@ provisioned from the one root module rather than having their own state.
 ## Prerequisites
 
 1. An AWS account with admin access (you, personally, for the lab)
-2. Terraform >= 1.6
+2. Terraform >= 1.6 (CI pins 1.11.0)
 3. AWS CLI configured (`aws configure` or SSO profile)
-4. An S3 bucket + DynamoDB table for remote state (create once, manually or
-   via a small bootstrap config), since the backend in `versions.tf` expects
-   them to already exist:
-   ```bash
-   aws s3api create-bucket --bucket balraj-personal-lab-tfstate --region us-east-1 \
-     --create-bucket-configuration LocationConstraint=us-east-1
-   aws s3api put-bucket-versioning --bucket balraj-personal-lab-tfstate \
-     --versioning-configuration Status=Enabled
-   aws dynamodb create-table --table-name terraform-state-lock \
-     --attribute-definitions AttributeName=LockID,AttributeType=S \
-     --key-schema AttributeName=LockID,KeyType=HASH \
-     --billing-mode PAY_PER_REQUEST --region us-east-1
-   ```
+4. GitHub CLI (`gh`) authenticated (`gh auth login`) — only needed for the
+   first-time bootstrap script, which writes repo secrets and creates the
+   `production` environment
+
+The remote-state bucket, versioning, Object Lock, encryption, GitHub
+secrets, and the `production` environment are all created by the bootstrap
+script — you don't need to provision them by hand. State locking uses the
+**S3 native lockfile** (Terraform 1.10+, enabled via `use_lockfile = true`),
+so there's no DynamoDB table.
 
 ## Setup
 
+Bootstrap creates everything needed for the first `terraform apply`, then
+once OIDC is in place all subsequent changes flow through pull requests.
+
+### 1. One-shot bootstrap (creates state bucket + GH secrets + OIDC role)
+
 ```bash
-cd environments/hub
+./landing-zone/scripts/01.setup_s3-backend.sh
+```
+
+This script:
+- Creates the `balraj-personal-lab-tfstate` S3 bucket (versioning, Object
+  Lock in GOVERNANCE mode for 7 days, SSE-KMS, public access blocked)
+- Writes the S3 backend block into `landing-zone/environments/hub/versions.tf`
+- Sets the `TF_VAR_tf_state_bucket` repo secret
+- Runs `terraform apply -target module.github_oidc` to create the GitHub
+  Actions OIDC provider and `github-actions-landing-zone-role`
+  - If the OIDC provider already exists in AWS (e.g. from a previous run or
+    a CI destroy that did `terraform state rm`), the script detects it via
+    `aws iam list-open-id-connect-providers` and runs `terraform import`
+    before the targeted apply so it stays idempotent
+- Sets the `AWS_GITHUB_OIDC_ROLE_ARN` repo secret from the role ARN output
+- Creates the `production` GitHub environment
+
+If `terraform init` hasn't been run yet, the OIDC step is skipped (no
+state to apply against) — re-run the bootstrap after the first init.
+
+### 2. First local apply (chicken-and-egg)
+
+The OIDC role doesn't exist on the very first run, so the workflow can't
+assume it yet. Run one apply locally with your own AWS credentials:
+
+```bash
+cd landing-zone/environments/hub
 cp terraform.tfvars.example terraform.tfvars
-# edit terraform.tfvars: your IAM user ARN, a globally-unique log bucket name
+# edit terraform.tfvars: trusted principal ARNs, allowed branches, etc.
 
 terraform init
 terraform validate
-terraform plan
-terraform apply
+terraform plan -out=tfplan.binary
+terraform apply tfplan.binary
 ```
+
+### 3. Configure the production environment reviewer
+
+The bootstrap script creates the `production` GitHub Environment without
+reviewers, so the `apply` job in `terraform-plan-apply.yml` is currently
+ungated. Add yourself (or whoever should approve applies) as a required
+reviewer in **Repo → Settings → Environments → production**.
+
+### 4. From here on, everything goes through pull requests
+
+- PR to `main` → `plan` job runs, diff posted as a PR comment and the
+  plan is uploaded as a 5-day artifact
+- Merge to `main` → `apply` job runs after you approve the `production`
+  environment gate, applying the **exact** plan that was reviewed on the PR
+- Daily at 22:00 UTC → `drift-detection.yml` runs `terraform plan
+  -detailed-exitcode`; if anything has drifted out-of-band it opens a
+  GitHub Issue labelled `drift`, `infrastructure`
 
 ## Known caveats / things to check before relying on this
 
-- **Conformance pack S3 URI** (`modules/security-baseline/main.tf`): points
-  to an AWS-managed sample template path that was verified at time of
-  writing. AWS periodically relocates these. If `terraform apply` fails on
-  the conformance pack with an access/404 error, check the current path at
-  the [AWS Config conformance pack docs](https://docs.aws.amazon.com/config/latest/developerguide/conformancepack-sample-templates.html)
-  and update `template_s3_uri`.
-- **IAM permission boundary cross-environment deny**: the `DenyCrossEnvironmentAccess`
-  statement in `iam-boundaries` only triggers on resources that are already
-  tagged with an `Environment` tag. Untagged resources slip through, so pair
-  this with a Config rule (`required-tags`) for real enforcement — not
-  included here to keep the lab's first pass simple.
-- **Single NAT Gateway**: cost-optimized for a lab (one NAT, not one per AZ).
-  This is a single point of failure for egress — acceptable for personal use,
-  not for production.
+- **CIS Conformance Pack is NOT in Terraform.** `modules/security-baseline/`
+  only enables GuardDuty + Security Hub and subscribes to the CIS Foundations
+  v3.0.0 standard. The conformance pack itself is intentionally omitted
+  because AWS moved the S3 template URI; deploy it manually via
+  `aws configservice put-conformance-pack` after `terraform apply` if you
+  want the full Config rule set, or accept the Security Hub CIS standards
+  subscription as the lab baseline.
+- **Spoke → TGW routes are NOT applied.** `environments/hub/main.tf`
+  composes the spoke VPCs and the TGW attachment but does not yet create
+  the `aws_route` entries that point spoke private route tables at the
+  TGW. This is a TODO in `main.tf` — it needs a two-apply pattern because
+  `private_route_table_ids` is a computed output from the VPC module.
+  Apply once without these routes, then re-add once the VPC IDs are
+  stable in state. Until then, spoke ↔ spoke and spoke → internet traffic
+  does not actually route through the hub.
+- **VPC Flow Logs are disabled.** The root module does not pass
+  `flow_log_destination_arn` to any VPC module invocation, so no Flow
+  Logs are created. Wire the log bucket ARN in if you need them.
+- **OIDC provider conflict on re-bootstrap.** AWS only allows one
+  `token.actions.githubusercontent.com` OIDC provider per account. If one
+  already exists in this account from another IaC stack, the bootstrap
+  script's `terraform apply -target module.github_oidc` will fail with
+  `EntityAlreadyExists`. The bootstrap script handles the in-stack case
+  (imports the existing provider automatically). For cross-stack
+  conflicts, import it yourself (commands are documented in
+  `modules/github-oidc/main.tf`).
+- **IAM permission boundary conditioning.** `DenyCrossEnvironmentAccess`
+  only fires on resources already tagged with an `Environment` value.
+  Untagged resources pass through — pair with a Config `required-tags`
+  rule (not currently included) for full enforcement.
+- **Permission boundaries only cover dev/test/prod.** The IAM boundaries
+  module covers `["dev", "test", "prod"]` only; hub and shared-services
+  resources inherit whatever the deploying principal has.
+- **Single NAT Gateway**: cost-optimized for a lab (one NAT in the hub,
+  not one per AZ). Single point of egress failure — acceptable for
+  personal use, not for production.
 - **Region lock**: the SCP-equivalent region-lock statement in the IAM
   boundary hardcodes `us-east-1`. Update if you're building in a
   different region.
 
-## GitHub Actions setup (first-time bootstrap)
+## Teardown
 
-There's a chicken-and-egg problem: the workflows need an AWS role to exist
-before they can run, but that role is created *by* this Terraform. Bootstrap
-it once locally, then hand off to GitHub Actions for everything after.
+The teardown script mirrors the bootstrap script — whatever
+`01.setup_s3-backend.sh` creates, `02.destroy-s3-backend.sh` removes.
 
-1. **Apply once from your own machine** (with your AWS CLI credentials):
-   ```bash
-   cd environments/hub
-   terraform init
-   terraform apply
-   ```
-   This creates everything, including the GitHub OIDC provider and role.
+```bash
+./landing-zone/scripts/02.destroy-s3-backend.sh
+```
 
-2. **Grab the role ARN from the output:**
-   ```bash
-   terraform output github_actions_role_arn
-   ```
+This script:
+- Runs a **targeted** `terraform destroy -target module.github_oidc` to
+  remove the OIDC provider, role, PowerUserAccess attachment, and inline
+  IAM-management policy (only — the rest of the landing zone stays intact)
+- Manual fallback: if the OIDC provider still exists in AWS (e.g. after a
+  CI destroy that did `terraform state rm`), it finds any role trusting
+  that provider, detaches its policies, deletes the role, then deletes
+  the provider
+- Deletes the `balraj-personal-lab-tfstate` S3 bucket (handles Object
+  Lock bypass, all object versions + delete markers, incomplete multipart
+  uploads, with two typed confirmations required)
+- Removes the `TF_VAR_tf_state_bucket` and `AWS_GITHUB_OIDC_ROLE_ARN`
+  GitHub repo secrets
+- Deletes the `production` GitHub environment
 
-3. **Add it as a GitHub repo secret:**
-   - Repo → Settings → Secrets and variables → Actions → New repository secret
-   - Name: `AWS_GITHUB_OIDC_ROLE_ARN`
-   - Value: the ARN from step 2
+To tear down the entire landing zone infrastructure as well (VPCs, TGW,
+GuardDuty, etc.), run `cd landing-zone/environments/hub && terraform
+destroy` manually after the teardown script completes.
 
-4. **Create a GitHub Environment named `production`** (Settings → Environments)
-   and add yourself as a required reviewer — this is what gates the `apply`
-   job in `terraform-plan-apply.yml` behind manual approval.
+## CI destroy workflow
 
-5. **From here on, push to `main` or open a PR** and the workflows take over:
-   - PR → `plan` runs automatically, shows the diff in the PR
-   - Merge to `main` → `apply` runs after you approve the `production`
-     environment gate
-   - Daily → `drift-detection.yml` checks for manual console changes and
-     opens a GitHub Issue if it finds any
+`.github/workflows/destroy.yml` is a separate `workflow_dispatch`-only
+job that destroys the **whole** landing zone. It has a deliberate
+chicken-and-egg of its own: it runs as the OIDC role, so it can't let
+Terraform destroy that role mid-run. The `plan` job therefore
+`terraform state rm`s the four `module.github_oidc.*` resources first,
+so they survive in AWS but are no longer tracked. To run CI again after
+a CI destroy, either re-import the OIDC resources (see the comment in
+`modules/github-oidc/main.tf`) or run `01.setup_s3-backend.sh` + a
+local `terraform apply` to re-bootstrap from scratch.
 
-If you ever need to change the OIDC role/trust policy itself, do that one
-change via local `apply` again (you can't use a role to modify its own
-trust policy permissions cleanly via the same pipeline run).
-
-
+If you ever need to change the OIDC role/trust policy itself, do that
+one change via local `apply` again (you can't use a role to modify its
+own trust policy cleanly via the same pipeline run).
 
 Running this continuously (TGW attachments, NAT Gateway, Config, GuardDuty)
 runs roughly **$80-120/month AUD** — mostly Transit Gateway attachment
-hours and NAT Gateway. Destroy with `terraform destroy` when not actively
-using it, or scale down to a single VPC for cheaper day-to-day learning and
-only stand up the full hub-and-spoke when practicing that specific scenario.
+hours and NAT Gateway. Run `./landing-zone/scripts/02.destroy-s3-backend.sh`
+when not actively using it, or scale down to a single VPC for cheaper
+day-to-day learning and only stand up the full hub-and-spoke when
+practicing that specific scenario.
 
 ## Suggested learning path
 
