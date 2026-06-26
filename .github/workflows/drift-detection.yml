@@ -79,15 +79,23 @@ jobs:
       # Mirror what terraform-plan-apply.yml and destroy.yml do: ship the
       # plan binary alongside text + JSON so reviewers can download and
       # inspect it locally with `terraform show`.
+      #
+      # IMPORTANT: `actions/upload-artifact` does NOT honour
+      # `defaults.run.working-directory` (that setting only applies to
+      # `run:` blocks, not `uses:` actions). Paths must be absolute,
+      # which is why we prefix with `${{ env.WORKING_DIR }}/` even though
+      # every `run:` step is already in that directory. If you give it
+      # bare relative paths it resolves them against the repo root and
+      # fails with "No files were found".
       - name: Upload plan artifacts
         if: steps.tf-plan.outputs.exit_code == '2'
         uses: actions/upload-artifact@v4
         with:
           name: drift-plan
           path: |
-            drift.tfplan
-            drift-plan.txt
-            drift-plan.json
+            ${{ env.WORKING_DIR }}/drift.tfplan
+            ${{ env.WORKING_DIR }}/drift-plan.txt
+            ${{ env.WORKING_DIR }}/drift-plan.json
           retention-days: 30
           if-no-files-found: error
 
