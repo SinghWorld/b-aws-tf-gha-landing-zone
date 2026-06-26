@@ -1,97 +1,115 @@
-name: Terraform Destroy - Landing Zone                                                                                         
-                                                                                                                                  
-   # Manual trigger only. The required `confirm` input is the only safety gate:                                                   
-   # jobs only run if `inputs.confirm == 'DESTROY-LAB'` (case-sensitive).                                                         
-   on:                                                                                                                            
-     workflow_dispatch:                                                                                                           
-       inputs:                                                                                                                    
-         confirm:                                                                                                                 
-           description: 'Type DESTROY-LAB to confirm (case-sensitive)'                                                            
-           required: true                                                                                                         
-           type: string                                                                                                           
-                                                                                                                                  
-   permissions:                                                                                                                   
-     id-token: write   # required for OIDC auth to AWS                                                                            
-     contents: read                                                                                                               
-                                                                                                                                  
-   env:                                                                                                                           
-     TF_VERSION: "1.11.0"                                                                                                         
-     WORKING_DIR: "landing-zone/environments/hub"                                                                                 
-                                                                                                                                  
-   jobs:                                                                                                                          
-     # ---------- 1. Generate destroy plan ----------                                                                             
-     plan:                                                                                                                        
-       name: Terraform Destroy Plan                                                                                               
-       if: inputs.confirm == 'DESTROY-LAB'                                                                                        
-       runs-on: ubuntu-latest                                                                                                     
-       steps:                                                                                                                     
-         - uses: actions/checkout@v4                                                                                              
-                                                                                                                                  
-         - uses: hashicorp/setup-terraform@v3                                                                                     
-           with:                                                                                                                  
-             terraform_version: ${{ env.TF_VERSION }}                                                                             
-                                                                                                                                  
-         - name: Configure AWS credentials (OIDC)                                                                                 
-           uses: aws-actions/configure-aws-credentials@v4                                                                         
-           with:                                                                                                                  
-             role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}                                                              
-             aws-region: us-east-1                                                                                                
-                                                                                                                                  
-         - name: Terraform Init                                                                                                   
-           working-directory: ${{ env.WORKING_DIR }}                                                                              
-           run: terraform init                                                                                                    
-                                                                                                                                  
-         # MAINTENANCE: if anyone adds a new resource to modules/github-oidc/main.tf,                                             
-         # add a matching -exclude flag here. Otherwise destroy will attempt to                                                   
-         # destroy the OIDC role mid-run and lose its own credentials.                                                            
-         - name: Terraform Destroy Plan (excluding OIDC resources)                                                                
-           working-directory: ${{ env.WORKING_DIR }}                                                                              
-           run: |                                                                                                                 
-             terraform plan -destroy -no-color -out=tfplan-destroy.binary \                                                       
-               -exclude=module.github_oidc.aws_iam_openid_connect_provider.github \                                               
-               -exclude=module.github_oidc.aws_iam_role.github_actions \                                                          
-               -exclude=module.github_oidc.aws_iam_role_policy.iam_management \                                                   
-               -exclude=module.github_oidc.aws_iam_role_policy_attachment.power_user                                              
-                                                                                                                                  
-         - name: Upload destroy plan artifact                                                                                     
-           uses: actions/upload-artifact@v4                                                                                       
-           with:                                                                                                                  
-             name: tfplan-destroy                                                                                                 
-           path: ${{ env.WORKING_DIR }}/tfplan-destroy.binary                                                                     
-           retention-days: 5                                                                                                      
-                                                                                                                                  
-     # ---------- 2. Apply the destroy plan ----------                                                                            
-     destroy:                                                                                                                     
-       name: Terraform Destroy                                                                                                    
-       needs: plan                                                                                                                
-       if: inputs.confirm == 'DESTROY-LAB'                                                                                        
-       runs-on: ubuntu-latest                                                                                                     
-       steps:                                                                                                                     
-         - uses: actions/checkout@v4                                                                                              
-                                                                                                                                  
-         - uses: hashicorp/setup-terraform@v3                                                                                     
-           with:                                                                                                                  
-             terraform_version: ${{ env.TF_VERSION }}                                                                             
-                                                                                                                                  
-         - name: Configure AWS credentials (OIDC)                                                                                 
-           uses: aws-actions/configure-aws-credentials@v4                                                                         
-           with:                                                                                                                  
-             role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}                                                              
-             aws-region: us-east-1                                                                                                
-                                                                                                                                  
-         - name: Terraform Init                                                                                                   
-           working-directory: ${{ env.WORKING_DIR }}                                                                              
-           run: terraform init                                                                                                    
-                                                                                                                                  
-         - name: Download destroy plan artifact                                                                                   
-           uses: actions/download-artifact@v4                                                                                     
-           with:                                                                                                                  
-             name: tfplan-destroy                                                                                                 
-           path: ${{ env.WORKING_DIR }}                                                                                           
-                                                                                                                                  
-         # Applies the EXACT plan produced by the `plan` job, so state mutations                                                  
-         # match what was reviewed. If state changes between plan and apply                                                       
-         # (e.g. someone else ran terraform), Terraform will refuse and fail.                                                     
-         - name: Terraform Destroy (using saved plan)                                                                             
-           working-directory: ${{ env.WORKING_DIR }}                                                                              
-           run: terraform apply -destroy -auto-approve tfplan-destroy.binary
+name: Terraform Destroy - Landing Zone
+
+# Manual trigger only. The required `confirm` input is the only safety gate:
+# jobs only run if `inputs.confirm == 'DESTROY-LAB'` (case-sensitive).
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DESTROY-LAB to confirm (case-sensitive)'
+        required: true
+        type: string
+
+# Serialize runs of THIS workflow. cancel-in-progress: false so an
+# in-flight destroy is never silently killed mid-apply. The state lock
+# already prevents concurrent destroy + plan-apply, but two concurrent
+# destroys would still race the lock acquisition step.
+concurrency:
+  group: terraform-destroy-landing-zone
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # required for OIDC auth to AWS
+  contents: read
+
+env:
+  TF_VERSION: "1.11.0"
+  WORKING_DIR: "landing-zone/environments/hub"
+
+jobs:
+  # ---------- 1. Generate destroy plan ----------
+  plan:
+    name: Terraform Destroy Plan
+    if: inputs.confirm == 'DESTROY-LAB'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform init
+
+      # MAINTENANCE: if anyone adds a new resource to modules/github-oidc/main.tf,
+      # add a matching -exclude flag here. Otherwise destroy will attempt to
+      # destroy the OIDC role mid-run and lose its own credentials.
+      - name: Terraform Destroy Plan (excluding OIDC resources)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          terraform plan -destroy -no-color -out=tfplan-destroy.binary \
+            -exclude=module.github_oidc.aws_iam_openid_connect_provider.github \
+            -exclude=module.github_oidc.aws_iam_role.github_actions \
+            -exclude=module.github_oidc.aws_iam_role_policy.iam_management \
+            -exclude=module.github_oidc.aws_iam_role_policy_attachment.power_user
+
+      - name: Upload destroy plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-destroy
+          path: ${{ env.WORKING_DIR }}/tfplan-destroy.binary
+          retention-days: 5
+
+  # ---------- 2. Apply the destroy plan ----------
+  # `environment: production` adds a required-reviewer approval gate on
+  # top of the `DESTROY-LAB` confirm input. Configure reviewers on the
+  # `production` environment in repo settings; otherwise the gate is a
+  # no-op. This mirrors the apply gate used in terraform-plan-apply.yml.
+  destroy:
+    name: Terraform Destroy
+    needs: plan
+    if: inputs.confirm == 'DESTROY-LAB'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform init
+
+      - name: Download destroy plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-destroy
+          path: ${{ env.WORKING_DIR }}
+
+      # Applies the EXACT plan produced by the `plan` job, so state mutations
+      # match what was reviewed. If state changes between plan and apply
+      # (e.g. someone else ran terraform), Terraform will refuse and fail.
+      #
+      # NOTE: do NOT add `-destroy` here. The plan file already encodes a
+      # destroy plan, and `-destroy` is a planning-mode flag that Terraform
+      # rejects (or, on older versions, silently ignores) when a saved
+      # plan file is supplied. See hashicorp/terraform#38698.
+      - name: Terraform Destroy (using saved plan)
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan-destroy.binary
