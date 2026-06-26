@@ -302,7 +302,7 @@ Two `aws_s3_bucket_policy` resources are created for the same bucket, which will
 **Backup Total:** **6**
 
 ---
-
+---
 ## GitHub OIDC Integration
 
 | Resource Type | Count | Notes |
