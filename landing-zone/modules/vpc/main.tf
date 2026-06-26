@@ -128,10 +128,10 @@ resource "aws_route_table_association" "private" {
 # ---------- Flow Logs (sent to module consumer's CloudWatch Log Group / S3 via logging module) ----------
 resource "aws_flow_log" "this" {
   count                = var.flow_log_destination_arn != null ? 1 : 0
-  vpc_id                = aws_vpc.this.id
-  traffic_type          = "ALL"
-  log_destination_type  = var.flow_log_destination_type
-  log_destination       = var.flow_log_destination_arn
+  vpc_id               = aws_vpc.this.id
+  traffic_type         = "ALL"
+  log_destination_type = var.flow_log_destination_type
+  log_destination      = var.flow_log_destination_arn
 
   tags = merge(local.common_tags, {
     Name = "${var.name}-flow-log"

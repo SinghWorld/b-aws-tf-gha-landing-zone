@@ -130,8 +130,8 @@ data "aws_iam_policy_document" "log_bucket_policy" {
   }
 
   statement {
-    sid       = "DenyObjectDeletion"
-    effect    = "Deny"
+    sid    = "DenyObjectDeletion"
+    effect = "Deny"
     principals {
       type        = "AWS"
       identifiers = ["*"]
@@ -197,15 +197,10 @@ resource "aws_iam_role_policy_attachment" "config_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWS_ConfigRole"
 }
 
-resource "aws_s3_bucket_policy" "log_archive_config_addendum" {
-  # Config also needs to write to the same bucket - handled via a separate
-  # statement merge would be cleaner, but for lab simplicity Config gets its
-  # own prefix permission appended through this dependent resource ordering.
-  bucket     = aws_s3_bucket.log_archive.id
-  policy     = data.aws_iam_policy_document.log_bucket_policy.json
-  depends_on = [aws_cloudtrail.this]
-}
-
+# NOTE: AWS allows only one bucket policy per S3 bucket. The Config write/read
+# permissions are already declared in `data.aws_iam_policy_document.log_bucket_policy`
+# (statements `AWSConfigWrite` and `AWSConfigRead`), so a single
+# `aws_s3_bucket_policy` above is sufficient — no separate "addendum" needed.
 resource "aws_config_configuration_recorder" "this" {
   name     = "personal-lab-recorder"
   role_arn = aws_iam_role.config_role.arn

@@ -180,3 +180,179 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+
+
+---
+# AWS Terraform Infrastructure Resource Summary
+
+## Resource Inventory
+
+| Module | Resource Type | Count | Notes |
+|---------|---------------|------:|-------|
+| **Hub VPC** | `aws_vpc` | 1 | 10.0.0.0/24 |
+| | `aws_subnet` (public) | 2 | 10.0.0.0/27, 10.0.0.32/27 |
+| | `aws_subnet` (private) | 2 | 10.0.0.64/27, 10.0.0.96/27 |
+| | `aws_internet_gateway` | 1 | |
+| | `aws_route_table` (public) | 1 | + 1 route to IGW |
+| | `aws_route_table_association` (public) | 2 | |
+| | `aws_eip` | 1 | For NAT Gateway |
+| | `aws_nat_gateway` | 1 | |
+| | `aws_route_table` (private) | 1 | + 1 route to NAT |
+| | `aws_route_table_association` (private) | 2 | |
+| **Hub Total** | | **15** | No VPC Flow Logs (optional variable is null) |
+
+---
+
+## Spoke VPCs (4 × Dev, Test, Prod, Shared)
+
+### Per Spoke
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_vpc` | 1 | |
+| `aws_subnet` (private) | 2 | No public subnet, no NAT |
+| `aws_route_table` (private) | 1 | No default route (TODO) |
+| `aws_route_table_association` | 2 | |
+
+**Resources per spoke:** **6**
+
+**Total resources across 4 spokes:** **24**
+
+---
+
+## Transit Gateway
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_ec2_transit_gateway` | 1 | |
+| `aws_ec2_transit_gateway_route_table` | 1 | Shared route table |
+| `aws_ec2_transit_gateway_vpc_attachment` | 5 | Hub + 4 spokes |
+| `aws_ec2_transit_gateway_route_table_association` | 5 | |
+| `aws_ec2_transit_gateway_route_table_propagation` | 5 | |
+
+**Transit Gateway Total:** **17**
+
+---
+
+## IAM Boundaries
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_iam_policy` (Permission Boundary) | 3 | Dev/Test/Prod |
+| `aws_iam_role` (Environment Admin) | 3 | PowerUserAccess |
+| `aws_iam_role_policy_attachment` | 3 | |
+
+**IAM Total:** **9**
+
+> **Note:** No permission boundary exists for Hub or Shared environments.
+
+---
+
+## Logging
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_s3_bucket` | 1 | Log Archive |
+| `aws_s3_bucket_versioning` | 1 | |
+| `aws_s3_bucket_public_access_block` | 1 | |
+| `aws_s3_bucket_server_side_encryption_configuration` | 1 | SSE-KMS |
+| `aws_s3_bucket_lifecycle_configuration` | 1 | 90d IA → 180d Glacier → 365d Expire |
+| `aws_s3_bucket_policy` | 1 | Log Archive |
+| `aws_s3_bucket_policy` | 1 | Duplicate (will fail) |
+| `aws_cloudtrail` | 1 | Multi-region with log validation |
+| `aws_iam_role` | 1 | AWS Config |
+| `aws_iam_role_policy_attachment` | 1 | AWS_ConfigRole |
+| `aws_config_configuration_recorder` | 1 | |
+| `aws_config_delivery_channel` | 1 | |
+| `aws_config_configuration_recorder_status` | 1 | |
+
+**Logging Total:** **13**
+
+⚠️ **Issue Identified**
+
+Two `aws_s3_bucket_policy` resources are created for the same bucket, which will cause Terraform to fail because only one bucket policy can exist per S3 bucket.
+
+---
+
+## Security Baseline
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_guardduty_detector` | 1 | 15-minute finding frequency |
+| `aws_securityhub_account` | 1 | |
+| `aws_securityhub_standards_subscription` | 1 | CIS Foundations v3.0.0 |
+
+**Security Total:** **3**
+
+> **Note:** CIS Conformance Pack has not been deployed.
+
+---
+
+## AWS Backup
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_backup_vault` | 1 | |
+| `aws_iam_role` | 1 | Backup Role |
+| `aws_iam_role_policy_attachment` | 2 | Backup & Restore |
+| `aws_backup_plan` | 1 | Daily at 03:00 UTC, 35-day retention |
+| `aws_backup_selection` | 1 | Tag: `Environment=prod` |
+
+**Backup Total:** **6**
+
+---
+
+## GitHub OIDC Integration
+
+| Resource Type | Count | Notes |
+|---------------|------:|-------|
+| `aws_iam_openid_connect_provider` | 1 | `token.actions.githubusercontent.com` |
+| `aws_iam_role` | 1 | GitHub Actions |
+| `aws_iam_role_policy_attachment` | 1 | PowerUserAccess |
+| `aws_iam_role_policy` | 1 | Scoped IAM Management |
+
+**OIDC Total:** **4**
+
+---
+
+# Overall Summary
+
+| Module | Resources |
+|---------|----------:|
+| Hub VPC | 15 |
+| Spoke VPCs | 24 |
+| Transit Gateway | 17 |
+| IAM | 9 |
+| Logging | 13 |
+| Security | 3 |
+| Backup | 6 |
+| GitHub OIDC | 4 |
+| **Grand Total** | **91** |
+
+---
+
+# Observations
+
+## Good Practices
+
+- Hub-and-Spoke architecture
+- Transit Gateway implementation
+- CloudTrail enabled
+- AWS Config enabled
+- GuardDuty enabled
+- Security Hub enabled
+- Backup Plan configured
+- GitHub OIDC authentication
+- S3 encryption enabled
+- Lifecycle policy configured
+
+## Improvements Required
+
+- Add VPC Flow Logs
+- Fix duplicate S3 Bucket Policy
+- Add default routes in spoke VPCs
+- Add NAT Gateway (if outbound internet is required)
+- Enable CIS Conformance Pack
+- Apply IAM Permission Boundaries consistently
+- Enable additional Security Hub standards
+- Consider centralized CloudWatch Log Groups
