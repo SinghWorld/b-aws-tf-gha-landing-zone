@@ -52,7 +52,7 @@ landing-zone/
 │   └── 02.destroy-s3-backend.sh # full teardown (OIDC module + bucket + GH bits)
 └── .github/workflows/
     ├── terraform-plan-apply.yml # PR → plan; push to main → apply (env-gated)
-    ├── drift-detection.yml      # daily plan; opens GH Issue on drift
+    ├── drift-detection.yml      # daily plan; opens/updates one canonical GH Issue with auto-close on resolution
     └── destroy.yml              # manual workflow_dispatch; state-rm OIDC then destroy
 ```
 
@@ -132,9 +132,17 @@ reviewer in **Repo → Settings → Environments → production**.
   plan is uploaded as a 5-day artifact
 - Merge to `main` → `apply` job runs after you approve the `production`
   environment gate, applying the **exact** plan that was reviewed on the PR
-- Daily at 22:00 UTC → `drift-detection.yml` runs `terraform plan
-  -detailed-exitcode`; if anything has drifted out-of-band it opens a
-  GitHub Issue labelled `drift`, `infrastructure`
+- Daily at 22:00 UTC → `[PROD] Terraform - Configuration Drift Detection`
+  runs `terraform plan -detailed-exitcode`. On drift it opens or updates
+  a single canonical **"Terraform Configuration Drift Detected"** GitHub
+  Issue labelled `drift-detection`, `terraform` (collapsing repeated drift
+  into one issue rather than piling up date-stamped ones, with the full
+  resource-change list and a collapsible plan-diff body); when the plan
+  comes back clean it auto-closes that issue and posts a ✅ resolution
+  comment pointing at the resolving run, so the tracker self-heals once
+  drift is reconciled. The workflow run itself fails (red ❌) whenever
+  drift is present — that's the visibility signal in the Actions tab; the
+  historical run stays red until the underlying drift is resolved.
 
 ## Known caveats / things to check before relying on this
 
@@ -242,3 +250,96 @@ practicing that specific scenario.
    gets picked up by the backup selection
 5. Once comfortable, this maps directly to SAP-C02 exam scenarios on
    multi-account network design and AWS Organizations governance
+
+## Resources created by `terraform apply`
+
+`terraform apply` creates **100 AWS resources** across nine modules plus
+two root-level route resources. Per-module breakdown below — counts are
+the actual instances Terraform creates after `count` / `for_each`
+expansion (verified by walking the current source, not by counting
+`resource` blocks).
+
+### Summary
+
+| Module / Group | Count |
+|---|---:|
+| Network — Hub VPC | 16 |
+| Network — Spoke VPCs (×4: dev, test, prod, shared) | 24 |
+| Transit Gateway | 18 |
+| Root-level routes (in `environments/hub/main.tf`) | 8 |
+| IAM Boundaries (×3 envs: dev, test, prod) | 9 |
+| Logging | 12 |
+| Security Baseline | 3 |
+| AWS Backup | 6 |
+| GitHub OIDC Integration | 4 |
+| **Grand total** | **100** |
+
+### Detailed inventory
+
+| Module / Group | Resource Type | Count | Notes |
+|---|---:|---:|---|
+| **Network — Hub VPC** (`module.hub_vpc`) | | **16** | `10.0.0.0/24`, single NAT (cost-optimised), DNS support + hostnames enabled |
+| | `aws_vpc` | 1 | |
+| | `aws_subnet` (public) | 2 | `10.0.0.0/27`, `10.0.0.32/27` |
+| | `aws_subnet` (private) | 2 | `10.0.0.64/27`, `10.0.0.96/27` |
+| | `aws_internet_gateway` | 1 | |
+| | `aws_route_table` (public) | 1 | + 1 route to IGW |
+| | `aws_route_table_association` (public) | 2 | |
+| | `aws_eip` | 1 | For NAT Gateway |
+| | `aws_nat_gateway` | 1 | |
+| | `aws_route_table` (private) | 1 | + 1 route to NAT |
+| | `aws_route_table_association` (private) | 2 | |
+| **Network — Spoke VPCs** (`module.{dev,test,prod,shared_services}_vpc`, ×4) | | **6 × 4 = 24** | No public subnets, no NAT; egress flows through hub via TGW |
+| | `aws_vpc` | 1 | |
+| | `aws_subnet` (private) | 2 | |
+| | `aws_route_table` (private) | 1 | Default route populated at root level (see below) |
+| | `aws_route_table_association` (private) | 2 | |
+| **Transit Gateway** (`module.transit_gateway`) | | **18** | Single shared route table; all VPCs propagate into it; default `0.0.0.0/0` pinned to hub attachment |
+| | `aws_ec2_transit_gateway` | 1 | |
+| | `aws_ec2_transit_gateway_route_table` | 1 | Shared route table |
+| | `aws_ec2_transit_gateway_vpc_attachment` | 5 | Hub + 4 spokes |
+| | `aws_ec2_transit_gateway_route_table_association` | 5 | |
+| | `aws_ec2_transit_gateway_route_table_propagation` | 5 | |
+| | `aws_ec2_transit_gateway_route` | 1 | `0.0.0.0/0` → hub attachment |
+| **Root-level routes** (`environments/hub/main.tf`) | | **8** | Composed after VPC + TGW IDs are known |
+| | `aws_route.spoke_default_to_tgw` | 4 | One per spoke private RT, `0.0.0.0/0` → TGW |
+| | `aws_route.hub_to_spokes` | 4 | One per spoke CIDR, spoke CIDR → TGW (return path for NAT'd traffic) |
+| **IAM Boundaries** (`module.iam_boundaries`, ×3 envs) | | **9** | SCP-equivalent permission boundaries; only dev/test/prod are isolated — hub and shared inherit the deployer's principal |
+| | `aws_iam_policy` (boundary) | 3 | `boundary-{dev,test,prod}`, contains `AllowWithinBoundary`, `DenyCrossEnvironmentAccess`, `DenyDisablingSecurityTooling`, `DenyOutsideHomeRegion` |
+| | `aws_iam_role` (env admin) | 3 | `{dev,test,prod}-admin-role`, `PowerUserAccess` + boundary attached |
+| | `aws_iam_role_policy_attachment` | 3 | |
+| **Logging** (`module.logging`) | | **12** | Centralised Log Archive equivalent: SSE-KMS, versioning, public-access block, lifecycle, deny-delete + deny-non-TLS bucket policy; multi-region CloudTrail; AWS Config recorder + delivery channel |
+| | `aws_s3_bucket` | 1 | Log archive |
+| | `aws_s3_bucket_versioning` | 1 | |
+| | `aws_s3_bucket_public_access_block` | 1 | |
+| | `aws_s3_bucket_server_side_encryption_configuration` | 1 | SSE-KMS (`aws/s3`) |
+| | `aws_s3_bucket_lifecycle_configuration` | 1 | 90d → STANDARD_IA, 180d → GLACIER, 365d → expire |
+| | `aws_s3_bucket_policy` | 1 | Denies object deletion + non-TLS access |
+| | `aws_cloudtrail` | 1 | Multi-region, log file validation enabled |
+| | `aws_iam_role` (Config) | 1 | `AWSConfigRole` |
+| | `aws_iam_role_policy_attachment` (Config) | 1 | |
+| | `aws_config_configuration_recorder` | 1 | |
+| | `aws_config_delivery_channel` | 1 | |
+| | `aws_config_configuration_recorder_status` | 1 | |
+| **Security Baseline** (`module.security_baseline`) | | **3** | CIS Conformance Pack is **not** deployed by Terraform (see Known caveats); Security Hub CIS Foundations v3.0.0 standard is subscribed as the lab baseline |
+| | `aws_guardduty_detector` | 1 | |
+| | `aws_securityhub_account` | 1 | |
+| | `aws_securityhub_standards_subscription` | 1 | CIS Foundations v3.0.0 |
+| **AWS Backup** (`module.backup`) | | **6** | Daily at 03:00 UTC, 35-day retention, tag-based selection on `Environment=prod` |
+| | `aws_backup_vault` | 1 | |
+| | `aws_iam_role` (Backup) | 1 | `AWSBackupServiceRole*` policies attached |
+| | `aws_iam_role_policy_attachment` | 2 | Backup + Restore |
+| | `aws_backup_plan` | 1 | |
+| | `aws_backup_selection` | 1 | Tag: `Environment=prod` |
+| **GitHub OIDC Integration** (`module.github_oidc`) | | **4** | Lets workflows assume an AWS role via OIDC — no long-lived keys |
+| | `aws_iam_openid_connect_provider` | 1 | `token.actions.githubusercontent.com` |
+| | `aws_iam_role` (GHA) | 1 | `github-actions-landing-zone-role` |
+| | `aws_iam_role_policy_attachment` | 1 | `PowerUserAccess` |
+| | `aws_iam_role_policy` | 1 | Scoped IAM management (PowerUserAccess excludes IAM by default) |
+
+### Not created by this project
+
+- **VPC Flow Logs** — the root module does not pass `flow_log_destination_arn` to any VPC, so no `aws_flow_log` resources are created. Wire the log bucket ARN in if you need them.
+- **CIS Conformance Pack** — see Known caveats above.
+- **Permission boundaries for `hub` / `shared`** — only `dev`/`test`/`prod` are isolated; hub and shared-services resources inherit the deployer's principal.
+- **NAT Gateways on spoke VPCs** — single NAT lives in the hub for cost reasons; spoke egress traverses the TGW.
