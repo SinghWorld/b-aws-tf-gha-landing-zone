@@ -8,9 +8,14 @@ locals {
   )
 
   # Trust condition subjects: one for each allowed branch (push/apply) plus
-  # a wildcard for pull_request events (which use a different sub format)
-  branch_subs = [for b in var.allowed_branches : "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${b}"]
-  pr_sub      = "repo:${var.github_org}/${var.github_repo}:pull_request"
+  # a wildcard for pull_request events (which use a different sub format),
+  # plus one per allowed GitHub Environment. When a workflow job targets an
+  # environment (e.g. `environment: production` for an approval gate), the
+  # OIDC sub becomes `repo:ORG/REPO:environment:<name>` regardless of the
+  # underlying event - so omitting these denies the apply job entirely.
+  branch_subs      = [for b in var.allowed_branches : "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${b}"]
+  pr_sub           = "repo:${var.github_org}/${var.github_repo}:pull_request"
+  environment_subs = [for e in var.allowed_environments : "repo:${var.github_org}/${var.github_repo}:environment:${e}"]
 }
 
 # GitHub's OIDC provider - reuse the existing one if you already created it
@@ -52,7 +57,7 @@ data "aws_iam_policy_document" "trust" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = concat(local.branch_subs, ["${local.pr_sub}"])
+      values   = concat(local.branch_subs, [local.pr_sub], local.environment_subs)
     }
   }
 }
