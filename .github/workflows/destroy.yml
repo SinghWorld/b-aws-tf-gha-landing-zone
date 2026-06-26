@@ -49,17 +49,35 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         run: terraform init
 
-      # MAINTENANCE: if anyone adds a new resource to modules/github-oidc/main.tf,
-      # add a matching -exclude flag here. Otherwise destroy will attempt to
-      # destroy the OIDC role mid-run and lose its own credentials.
-      - name: Terraform Destroy Plan (excluding OIDC resources)
+      # The destroy workflow runs as the OIDC role, so we cannot let Terraform
+      # destroy that role mid-run or we'd lose credentials for the rest of the
+      # apply. Terraform has no `-exclude` flag (that's OpenTofu-only), and
+      # `lifecycle.prevent_destroy = true` causes `terraform destroy` to error
+      # out without destroying anything. So we remove the OIDC resources from
+      # state before generating the destroy plan — Terraform only destroys
+      # what's in state, so the OIDC role and provider survive in AWS.
+      #
+      # The OIDC resources still exist in AWS after this workflow completes,
+      # but they are no longer tracked by Terraform state. To run CI again,
+      # either re-import them into state (see modules/github-oidc/main.tf for
+      # the import commands) or run scripts/01.setup_s3-backend.sh + a local
+      # apply to re-bootstrap. The `|| true` makes this step idempotent so
+      # the workflow still succeeds if state was already cleaned up.
+      - name: Remove OIDC resources from state (so destroy skips them)
         working-directory: ${{ env.WORKING_DIR }}
         run: |
-          terraform plan -destroy -no-color -out=tfplan-destroy.binary \
-            -exclude=module.github_oidc.aws_iam_openid_connect_provider.github \
-            -exclude=module.github_oidc.aws_iam_role.github_actions \
-            -exclude=module.github_oidc.aws_iam_role_policy.iam_management \
-            -exclude=module.github_oidc.aws_iam_role_policy_attachment.power_user
+          terraform state rm \
+            module.github_oidc.aws_iam_openid_connect_provider.github || true
+          terraform state rm \
+            module.github_oidc.aws_iam_role.github_actions || true
+          terraform state rm \
+            module.github_oidc.aws_iam_role_policy.iam_management || true
+          terraform state rm \
+            module.github_oidc.aws_iam_role_policy_attachment.power_user || true
+
+      - name: Terraform Destroy Plan
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform plan -destroy -no-color -out=tfplan-destroy.binary
 
       - name: Upload destroy plan artifact
         uses: actions/upload-artifact@v4
@@ -102,9 +120,9 @@ jobs:
           name: tfplan-destroy
           path: ${{ env.WORKING_DIR }}
 
-      # Applies the EXACT plan produced by the `plan` job, so state mutations
-      # match what was reviewed. If state changes between plan and apply
-      # (e.g. someone else ran terraform), Terraform will refuse and fail.
+      # Applies the EXACT plan produced by the `plan` job. State was already
+      # mutated by the `state rm` step in the plan job, so the state serial
+      # baked into the plan matches the current state.
       #
       # NOTE: do NOT add `-destroy` here. The plan file already encodes a
       # destroy plan, and `-destroy` is a planning-mode flag that Terraform
