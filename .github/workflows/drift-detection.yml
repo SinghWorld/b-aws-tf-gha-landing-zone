@@ -1,14 +1,14 @@
-name: Terraform Drift Detection - Landing Zone
+name: '[PROD] Terraform - Configuration Drift Detection'
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 22 * * *" # daily at 8am AEST (22:00 UTC previous day)
-  workflow_dispatch:
 
 permissions:
   id-token: write   # required for OIDC auth to AWS
   contents: read
-  issues: write     # required to open the drift issue
+  issues: write     # required to open/update/close the canonical drift issue
 
 env:
   TF_VERSION: "1.11.0"  # >= 1.11 required for use_lockfile (S3 native state locking, GA in 1.11)
@@ -16,25 +16,42 @@ env:
 
 jobs:
   drift-check:
-    name: Check for drift
+    name: 'Terraform Drift Check'
     runs-on: ubuntu-latest
+    # Default working-directory for every `run:` step in this job. The
+    # `uses:` actions (checkout, setup-terraform, configure-aws-credentials,
+    # upload-artifact, github-script) are unaffected by this setting.
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    env:
+      # Surface every API call in the runner log — invaluable when
+      # debugging "the plan failed for no apparent reason" drift runs.
+      TF_LOG: INFO
     steps:
-      - uses: actions/checkout@v4
+      # ------- Step 1: Checkout Code -------
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      # ------- Step 2: Setup Terraform -------
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
+          terraform_wrapper: false   # cleaner log output; TF_LOG still works via env
           terraform_version: ${{ env.TF_VERSION }}
 
+      # ------- Step 3: Configure AWS credentials (OIDC) -------
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
           aws-region: us-east-1
 
+      # ------- Step 4: Terraform Init -------
       - name: Terraform Init
-        working-directory: ${{ env.WORKING_DIR }}
         run: terraform init
 
+      # ------- Step 5: Terraform Plan (detect drift) -------
       # `terraform plan -detailed-exitcode` exit codes:
       #   0 = no changes (state matches live infra) — clean run
       #   1 = error (auth, syntax, transient AWS API issue)
@@ -42,71 +59,81 @@ jobs:
       # We disable errexit for this step so the non-zero exit doesn't
       # terminate the script before we record the code into $GITHUB_OUTPUT.
       - name: Terraform Plan (detect drift)
-        id: plan
-        working-directory: ${{ env.WORKING_DIR }}
+        id: tf-plan
         run: |
           set +e
           terraform plan -detailed-exitcode -no-color -out=drift.tfplan
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
+      # ------- Step 6: Render plan as text + JSON -------
       # When drift is detected, render the binary plan into both a
       # human-readable text file (for the workflow summary and issue body)
       # and a structured JSON file (for the parsed resource-change list).
       - name: Render plan as text + JSON
-        if: steps.plan.outputs.exit_code == '2'
-        working-directory: ${{ env.WORKING_DIR }}
+        if: steps.tf-plan.outputs.exit_code == '2'
         run: |
           terraform show -no-color drift.tfplan > drift-plan.txt
           terraform show -json drift.tfplan | jq '.' > drift-plan.json
 
+      # ------- Step 7: Upload plan artifacts -------
+      # Mirror what terraform-plan-apply.yml and destroy.yml do: ship the
+      # plan binary alongside text + JSON so reviewers can download and
+      # inspect it locally with `terraform show`.
+      - name: Upload plan artifacts
+        if: steps.tf-plan.outputs.exit_code == '2'
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-plan
+          path: |
+            drift.tfplan
+            drift-plan.txt
+            drift-plan.json
+          retention-days: 30
+          if-no-files-found: error
+
+      # ------- Step 8: Publish drift summary -------
       # The step summary is the first thing you see when you open the
       # workflow run in the Actions tab. Putting the drift diff here makes
       # the problem obvious without having to scroll through the log.
       - name: Publish drift summary
-        if: steps.plan.outputs.exit_code == '2'
-        working-directory: ${{ env.WORKING_DIR }}
+        if: steps.tf-plan.outputs.exit_code == '2'
         run: |
           {
-            echo "## :rotating_light: Terraform drift detected"
+            echo "## :rotating_light: Terraform Configuration Drift Detected"
             echo ""
             echo "Live AWS infrastructure has drifted from the Terraform state in \`landing-zone/environments/hub\`."
             echo ""
-            echo "**Workflow run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "**Repo:** \`${{ github.repository }}\`"
+            echo "**Run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo "**Triggered by:** \`${{ github.event_name }}\`"
+            echo "**Environment:** \`prod\`"
             echo ""
-            echo "### Plan output"
+            echo "<details><summary>Click to expand — Full plan output</summary>"
             echo ""
             echo '```hcl'
             cat drift-plan.txt
             echo '```'
             echo ""
+            echo "</details>"
+            echo ""
             echo "Full machine-readable plan and binary are attached as workflow artifacts (\`drift-plan\`)."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # Mirror what terraform-plan-apply.yml and destroy.yml do: ship the
-      # plan binary alongside text + JSON so reviewers can download and
-      # inspect it locally with `terraform show`.
-      - name: Upload plan artifacts
-        if: steps.plan.outputs.exit_code == '2'
-        uses: actions/upload-artifact@v4
-        with:
-          name: drift-plan
-          path: |
-            ${{ env.WORKING_DIR }}/drift.tfplan
-            ${{ env.WORKING_DIR }}/drift-plan.txt
-            ${{ env.WORKING_DIR }}/drift-plan.json
-          retention-days: 30
-          if-no-files-found: error
-
-      # Open a GitHub issue that contains the parsed resource-change list
-      # and the full plan — no more "check the workflow run" hand-wave.
-      - name: Open issue on drift
-        if: steps.plan.outputs.exit_code == '2'
+      # ------- Step 9: Open or Update Issue if Drift Detected -------
+      # Manage a single canonical drift issue rather than opening one per
+      # run. Search for an open issue with the fixed title that was created
+      # by this bot — if found, update its body in place; if not, create a
+      # new one. This keeps the issue tracker focused: one canonical issue
+      # that tracks the current drift state, never a pile of stale ones.
+      - name: Publish Drift Report — Create or Update Issue
+        if: steps.tf-plan.outputs.exit_code == '2'
         uses: actions/github-script@v7
         env:
           WORKING_DIR: ${{ env.WORKING_DIR }}
           RUN_ID: ${{ github.run_id }}
           SERVER_URL: ${{ github.server_url }}
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const path = require('path');
@@ -137,21 +164,26 @@ jobs:
             }
 
             const body = [
-              '## :rotating_light: Terraform drift detected',
+              '## :rotating_light: Terraform Configuration Drift Detected',
               '',
-              `Detected on **${date}** in \`landing-zone/environments/hub\`.`,
+              `Detected on **${date}** in \`landing-zone/environments/hub\` (production landing zone).`,
               '',
-              `**Workflow run:** [${process.env.RUN_ID}](${runUrl})`,
+              `**Repo:** \`${context.repo.owner}/${context.repo.repo}\``,
+              `**Run:** [${process.env.RUN_ID}](${runUrl})`,
+              `**Triggered by:** \`${context.eventName}\``,
+              `**Environment:** \`prod\``,
               '',
               '### Resource changes',
               '',
               changesList,
               '',
-              '### Plan output',
+              '<details><summary>Click to expand — Full plan output</summary>',
               '',
               '```hcl',
               planText,
               '```',
+              '',
+              '</details>',
               '',
               '### Remediation',
               '',
@@ -162,27 +194,98 @@ jobs:
               'Artifacts (`drift-plan`) attached to the workflow run contain the binary, text, and JSON plans for forensic analysis.',
             ].join('\n');
 
-            await github.rest.issues.create({
+            const title = 'Terraform Configuration Drift Detected';
+            const creator = 'github-actions[bot]';
+            const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Drift detected in landing zone - ${date}`,
-              body,
-              labels: ['drift', 'infrastructure'],
+              state: 'open',
+              creator: creator,
+              title: title
             });
+            if (issues.data.length > 0) {
+              const issue = issues.data[0];
+              if (issue.body == body) {
+                console.log('Drift issue already up to date — no changes needed');
+              } else {
+                console.log('Drift issue found — updating with latest plan');
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: body
+                });
+              }
+            } else {
+              console.log('New drift detected — creating GitHub issue');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['drift-detection', 'terraform']
+              });
+            }
 
+      # ------- Step 10: Close Issue if No Drift -------
+      # Auto-close the canonical drift issue when the plan comes back
+      # clean. This signals that drift was detected in a previous run but
+      # has since been reconciled (by a follow-up apply, manual cleanup,
+      # or a state import/remove). Without this, the issue would sit open
+      # forever even after the underlying drift was fixed.
+      - name: Resolve Drift Report — Close Issue if Clean
+        if: steps.tf-plan.outputs.exit_code == '0'
+        uses: actions/github-script@v7
+        env:
+          RUN_ID: ${{ github.run_id }}
+          SERVER_URL: ${{ github.server_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title   = 'Terraform Configuration Drift Detected';
+            const creator = 'github-actions[bot]';
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              creator: creator,
+              title: title
+            });
+            if (issues.data.length > 0) {
+              const issue = issues.data[0];
+              const runUrl = `${process.env.SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.RUN_ID}`;
+              console.log('No drift detected — closing existing issue #' + issue.number);
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ Drift resolved — re-run of \`${context.workflow}\` ([run ${process.env.RUN_ID}](${runUrl})) at \`${context.eventName}\` reports no drift.`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+            } else {
+              console.log('No drift detected and no open issues — all clean!');
+            }
+
+      # ------- Step 11: Fail on Drift -------
       # Fail the job so the Actions tab shows a red ❌ for this run.
       # The GitHub issue and step summary are already populated by the
       # previous steps, so this is purely a visibility signal.
       - name: Fail on drift
-        if: steps.plan.outputs.exit_code == '2'
+        if: steps.tf-plan.outputs.exit_code == '2'
         run: |
           echo "::error::Terraform drift detected. See the workflow summary and the opened issue for details."
           exit 1
 
+      # ------- Step 12: Fail on Plan Error -------
       # Fail the job on real plan errors too (exit code 1) — silent
       # success on auth/syntax failures would be misleading.
       - name: Fail on plan error
-        if: steps.plan.outputs.exit_code == '1'
+        if: steps.tf-plan.outputs.exit_code == '1'
         run: |
           echo "::error::terraform plan failed. See the workflow log for the underlying error."
           exit 1
