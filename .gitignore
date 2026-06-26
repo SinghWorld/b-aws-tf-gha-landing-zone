@@ -85,5 +85,5 @@ node_modules/
 dist/
 *.generated.py
 
-graphify-out
+graphify-out/
 graphify-out/*
