@@ -33,6 +33,29 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      # TEMP DEBUG: dump OIDC token claims so we can see exactly what sub/aud
+      # GitHub is sending. Remove once trust-policy mismatch is diagnosed.
+      - name: 'Debug: dump OIDC token claims'
+        id: oidc-debug
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const token = await core.getIDToken('sts.amazonaws.com');
+              const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+              console.log('=== OIDC token claims ===');
+              console.log(JSON.stringify(payload, null, 2));
+              console.log('=== End OIDC token claims ===');
+              core.info(`OIDC sub:        ${payload.sub}`);
+              core.info(`OIDC aud:        ${payload.aud}`);
+              core.info(`OIDC event_name: ${payload.event_name}`);
+              core.info(`OIDC ref:        ${payload.ref}`);
+              core.info(`OIDC repository: ${payload.repository}`);
+            } catch (e) {
+              core.warning(`Failed to dump OIDC claims: ${e.message}`);
+            }
+
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -75,6 +98,29 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
+
+      # TEMP DEBUG: dump OIDC token claims so we can see exactly what sub/aud
+      # GitHub is sending. Remove once trust-policy mismatch is diagnosed.
+      - name: 'Debug: dump OIDC token claims'
+        id: oidc-debug
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const token = await core.getIDToken('sts.amazonaws.com');
+              const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+              console.log('=== OIDC token claims ===');
+              console.log(JSON.stringify(payload, null, 2));
+              console.log('=== End OIDC token claims ===');
+              core.info(`OIDC sub:        ${payload.sub}`);
+              core.info(`OIDC aud:        ${payload.aud}`);
+              core.info(`OIDC event_name: ${payload.event_name}`);
+              core.info(`OIDC ref:        ${payload.ref}`);
+              core.info(`OIDC repository: ${payload.repository}`);
+            } catch (e) {
+              core.warning(`Failed to dump OIDC claims: ${e.message}`);
+            }
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
