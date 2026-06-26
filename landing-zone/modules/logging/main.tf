@@ -6,6 +6,21 @@ locals {
     },
     var.tags
   )
+
+  # S3 key prefixes for CloudTrail and Config deliveries. Declared once here
+  # and referenced from both the resource config AND the bucket policy so the
+  # two never drift apart - drift here silently breaks log delivery with an
+  # opaque InsufficientS3BucketPolicyException at apply time.
+  cloudtrail_prefix = "cloudtrail"
+  config_prefix     = "config"
+}
+
+# AWS-managed CMK used by the bucket's SSE-KMS encryption. The Config delivery
+# channel requires this ARN explicitly when the destination bucket uses
+# SSE-KMS - it cannot infer it from the bucket (see AWS docs:
+# https://docs.aws.amazon.com/config/latest/developerguide/s3-kms-key.html).
+data "aws_kms_alias" "s3" {
+  name = "alias/aws/s3"
 }
 
 # ---------- Centralized log bucket (Log Archive account equivalent) ----------
@@ -94,7 +109,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
       identifiers = ["cloudtrail.amazonaws.com"]
     }
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.log_archive.arn}/AWSLogs/${var.account_id}/*"]
+    resources = ["${aws_s3_bucket.log_archive.arn}/${local.cloudtrail_prefix}/AWSLogs/${var.account_id}/*"]
     condition {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
@@ -110,7 +125,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
       identifiers = ["config.amazonaws.com"]
     }
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.log_archive.arn}/AWSLogs/${var.account_id}/Config/*"]
+    resources = ["${aws_s3_bucket.log_archive.arn}/${local.config_prefix}/AWSLogs/${var.account_id}/Config/*"]
     condition {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
@@ -166,7 +181,7 @@ resource "aws_s3_bucket_policy" "log_archive" {
 resource "aws_cloudtrail" "this" {
   name                          = var.trail_name
   s3_bucket_name                = aws_s3_bucket.log_archive.id
-  s3_key_prefix                 = "cloudtrail"
+  s3_key_prefix                 = local.cloudtrail_prefix
   include_global_service_events = true
   is_multi_region_trail         = true
   enable_log_file_validation    = true
@@ -214,10 +229,14 @@ resource "aws_config_configuration_recorder" "this" {
 resource "aws_config_delivery_channel" "this" {
   name           = "personal-lab-delivery-channel"
   s3_bucket_name = aws_s3_bucket.log_archive.id
-  s3_key_prefix  = "config"
-  # s3_kms_key_arn intentionally omitted — bucket uses SSE-KMS with alias/aws/s3.
-  # Config service delivers using its own service-linked key for cross-account/cross-region
-  # writes; explicit s3_kms_key_arn conflicts with how the delivery channel resolves keys.
+  s3_key_prefix  = local.config_prefix
+  # Required when the destination bucket uses SSE-KMS. Without this, Config
+  # returns InsufficientDeliveryPolicyException with "provided kms key is
+  # 'null'". Using the AWS-managed aws/s3 alias here because the bucket's
+  # SSE-KMS configuration also defaults to aws/s3 - keeping the two aligned
+  # avoids any cross-key permission headaches.
+  s3_kms_key_arn = data.aws_kms_alias.s3.arn
+
   depends_on = [aws_config_configuration_recorder.this]
 }
 

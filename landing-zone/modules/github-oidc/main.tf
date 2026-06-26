@@ -101,6 +101,11 @@ data "aws_iam_policy_document" "iam_management" {
       "iam:GetRolePolicy",
       "iam:ListRolePolicies",
       "iam:ListAttachedRolePolicies",
+      # Required as a precondition check before AWS will let us delete a
+      # role (even when no instance profiles are attached). Without this,
+      # `terraform destroy` fails with AccessDenied on every role. Added
+      # when destroy of env-admin / backup / config-recorder roles broke.
+      "iam:ListInstanceProfilesForRole",
       "iam:TagRole",
       "iam:TagPolicy",
       "iam:PassRole",
