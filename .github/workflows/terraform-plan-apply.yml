@@ -85,7 +85,11 @@ jobs:
   apply:
     name: Terraform Apply
     needs: plan
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Apply on push to main AND on manual workflow_dispatch against main.
+    # NEVER apply on pull_request — that's the review-time signal, not a
+    # merge signal. The `production` environment still requires manual
+    # approval before the apply step runs.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: production # add a manual approval gate on this environment in repo settings
     # Applies the exact plan reviewed on the PR, not a fresh one - this
