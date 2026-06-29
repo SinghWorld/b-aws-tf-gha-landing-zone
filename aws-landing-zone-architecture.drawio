@@ -1,222 +1,670 @@
-<mxfile host="Electron" agent="Claude">
+<mxfile host="Electron" agent="Claude" version="24.0.0">
   <diagram name="AWS Landing Zone Architecture" id="landing-zone-arch">
-    <mxGraphModel dx="3142" dy="2016" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="3200" pageHeight="2000" math="0" shadow="0">
+    <mxGraphModel dx="3600" dy="2400" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3600" pageHeight="2400" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1F2937;" value="AWS Single-Account Landing Zone — Personal Lab (Terraform / GitHub Actions)" vertex="1">
-          <mxGeometry height="40" width="3120" x="40" y="10" as="geometry" />
+
+        <!-- ====================== TITLE BAR ====================== -->
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#232F3E;shadow=0;" value="AWS Single-Account Landing Zone — Personal Lab" vertex="1">
+          <mxGeometry height="44" width="3520" x="40" y="10" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontColor=#6B7280;" value="Hub &amp; Spoke Network Topology — Region: us-east-1 — S3 Backend Lockfile State" vertex="1">
-          <mxGeometry height="24" width="3120" x="40" y="50" as="geometry" />
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#545B64;" value="Hub &amp; Spoke · Transit Gateway · IAM Permission Boundaries · GitHub Actions OIDC · Region us-east-1 · Terraform 1.7.5" vertex="1">
+          <mxGeometry height="24" width="3520" x="40" y="54" as="geometry" />
         </mxCell>
-        <mxCell id="layer-internet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#DC2626;fontSize=14;fontStyle=1;fontColor=#991B1B;verticalAlign=top;align=center;" value="INTERNET / EDGE LAYER" vertex="1">
-          <mxGeometry height="120" width="3120" x="40" y="90" as="geometry" />
+        <mxCell id="title-rule" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;strokeColor=#FF9900;strokeWidth=3;shadow=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="92" as="sourcePoint" />
+            <mxPoint x="3560" y="92" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="internet-cloud" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=14;fontStyle=1;fontColor=#7F1D1D;" value="Internet&#xa;(Public Users)" vertex="1">
-          <mxGeometry height="80" width="160" x="180" y="115" as="geometry" />
+
+        <!-- ====================== EDGE / CI/CD LAYER ====================== -->
+        <mxCell id="layer-edge" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7F0;strokeColor=#FF9900;strokeWidth=2;dashed=0;fontSize=14;fontStyle=1;fontColor=#232F3E;verticalAlign=top;align=left;spacingLeft=20;spacingTop=8;shadow=1;" value="EDGE LAYER · Internet / CI / OIDC / State Backend" vertex="1">
+          <mxGeometry height="200" width="3520" x="40" y="105" as="geometry" />
         </mxCell>
-        <mxCell id="github-actions" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=11;fontColor=#7F1D1D;align=center;" value="GitHub Actions&#xa;CI/CD (.github/workflows)&#xa;&#xa;• terraform-plan-apply.yml&#xa;• drift-detection.yml" vertex="1">
-          <mxGeometry height="100" width="260" x="440" y="105" as="geometry" />
+
+        <!-- Internet -->
+        <mxCell id="icon-internet" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.internet;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="Internet&#10;Users" vertex="1">
+          <mxGeometry height="60" width="60" x="100" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="oidc-provider" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FED7AA;strokeColor=#EA580C;fontSize=10;fontColor=#7C2D12;align=center;" value="AWS IAM OIDC Provider&#xa;token.actions.githubusercontent.com&#xa;(client_id: sts.amazonaws.com)" vertex="1">
-          <mxGeometry height="100" width="280" x="780" y="105" as="geometry" />
+        <mxCell id="icon-github" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.developer_tools;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="GitHub&#10;Repository" vertex="1">
+          <mxGeometry height="60" width="60" x="240" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="s3-state-bucket" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#D1FADF;strokeColor=#16A34A;fontSize=10;fontColor=#14532D;align=center;" value="S3 State Backend&#xa;balraj-personal-lab-tfstate&#xa;&#xa;• Encrypted (SSE)&#xa;• Versioned&#xa;• S3 Native Lockfile&#xa;• Key: landing-zone/terraform.tfstate" vertex="1">
-          <mxGeometry height="110" width="280" x="1120" y="100" as="geometry" />
+        <mxCell id="icon-gha" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.codepipeline;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="GitHub Actions&#10;Workflows" vertex="1">
+          <mxGeometry height="60" width="60" x="380" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="github-oidc-role" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FED7AA;strokeColor=#EA580C;fontSize=10;fontColor=#7C2D12;align=center;" value="github-actions-landing-zone-role&#xa;&#xa;• PowerUserAccess&#xa;• iam-management inline policy&#xa;• Trust: OIDC + sub claim&#xa;  (main branch + any PR)" vertex="1">
-          <mxGeometry height="110" width="300" x="1460" y="100" as="geometry" />
+        <mxCell id="icon-cognito" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="IAM OIDC&#10;Provider" vertex="1">
+          <mxGeometry height="60" width="60" x="540" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="internet-gw" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;fontSize=11;fontColor=#1E3A8A;align=center;" value="Internet Gateway&#xa;(hub-igw)&#xa;Attached to Hub VPC" vertex="1">
-          <mxGeometry height="100" width="300" x="2820" y="105" as="geometry" />
+        <mxCell id="icon-sts" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sts;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="STS&#10;AssumeRoleWithWebIdentity" vertex="1">
+          <mxGeometry height="60" width="60" x="680" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="layer-network" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;fontSize=14;fontStyle=1;fontColor=#1E3A8A;verticalAlign=top;align=center;" value="NETWORK LAYER — Hub &amp; Spoke (Transit Gateway)" vertex="1">
-          <mxGeometry height="640" width="3120" x="40" y="230" as="geometry" />
+        <mxCell id="icon-gha-role" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.iam_role;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="github-actions-&#10;landing-zone-role" vertex="1">
+          <mxGeometry height="60" width="60" x="820" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="tgw" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#1D4ED8;fontSize=11;fontStyle=1;fontColor=#1E3A8A;align=center;" value="AWS Transit Gateway&#xa;personal-lab-tgw&#xa;&#xa;• Single shared route table&#xa;• Default assoc/prop = disable&#xa;• DNS support enabled&#xa;• 5 VPC attachments" vertex="1">
-          <mxGeometry height="140" width="280" x="1380" y="500" as="geometry" />
+        <mxCell id="icon-kms-state" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kms;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="SSE-KMS&#10;Key" vertex="1">
+          <mxGeometry height="60" width="60" x="980" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="hub-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontSize=12;fontStyle=1;fontColor=#1E3A8A;verticalAlign=top;align=center;" value="HUB VPC — 10.0.0.0/24&#xa;(Egress &amp; Inspection)" vertex="1">
-          <mxGeometry height="180" width="340" x="180" y="500" as="geometry" />
+        <mxCell id="icon-s3-state" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="S3 State Backend&#10;balraj-personal-lab-tfstate" vertex="1">
+          <mxGeometry height="60" width="60" x="1120" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="hub-pub-sub1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Public Subnet&#xa;10.0.0.0/27&#xa;us-east-1a&#xa;map_public_ip" vertex="1">
-          <mxGeometry height="60" width="140" x="200" y="560" as="geometry" />
+        <mxCell id="icon-user-admin" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.user;sketch=0;fontSize=12;fontStyle=1;fontColor=#232F3E;shadow=1;" value="Admin&#10;(local dev)" vertex="1">
+          <mxGeometry height="60" width="60" x="1240" y="170" as="geometry" />
         </mxCell>
-        <mxCell id="hub-pub-sub2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Public Subnet&#xa;10.0.0.32/27&#xa;us-east-1b" vertex="1">
-          <mxGeometry height="45" width="140" x="200" y="625" as="geometry" />
+
+        <!-- Edge layer flow label (bold) -->
+        <mxCell id="edge-flow-label" parent="1" style="text;html=1;strokeColor=#FF9900;fillColor=#FFFFFF;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontStyle=1;fontColor=#232F3E;dashed=1;strokeWidth=1;" value="Workflow run → OIDC trust → AssumeRole → State lock/read → terraform apply" vertex="1">
+          <mxGeometry height="30" width="1300" x="100" y="248" as="geometry" />
         </mxCell>
-        <mxCell id="hub-nat-gw" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BFDBFE;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;align=center;" value="NAT Gateway&#xa;(single, cost-optimized)&#xa;+ Elastic IP" vertex="1">
-          <mxGeometry height="55" width="140" x="360" y="565" as="geometry" />
-        </mxCell>
-        <mxCell id="hub-priv-sub" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Private Subnets&#xa;10.0.0.64/27, /96&#xa;us-east-1a, 1b&#xa;(TGW attached)" vertex="1">
-          <mxGeometry height="45" width="140" x="360" y="625" as="geometry" />
-        </mxCell>
-        <mxCell id="hub-pub-rt" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontSize=9;fontColor=#1E3A8A;" value="Public Route Table&#xa;0.0.0.0/0 → IGW" vertex="1">
-          <mxGeometry height="22" width="300" x="200" y="530" as="geometry" />
-        </mxCell>
-        <mxCell id="dev-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontSize=12;fontStyle=1;fontColor=#1E3A8A;verticalAlign=top;align=center;" value="DEV VPC — 10.1.0.0/20" vertex="1">
-          <mxGeometry height="100" width="320" x="560" y="760" as="geometry" />
-        </mxCell>
-        <mxCell id="dev-priv-sub" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Private Subnets&#xa;10.1.0.0/22, /4.0/22&#xa;(TGW-attached, egress via hub)" vertex="1">
-          <mxGeometry height="50" width="280" x="580" y="800" as="geometry" />
-        </mxCell>
-        <mxCell id="test-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontSize=12;fontStyle=1;fontColor=#1E3A8A;verticalAlign=top;align=center;" value="TEST VPC — 10.2.0.0/20" vertex="1">
-          <mxGeometry height="100" width="320" x="920" y="760" as="geometry" />
-        </mxCell>
-        <mxCell id="test-priv-sub" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Private Subnets&#xa;10.2.0.0/22, /4.0/22&#xa;(TGW-attached)" vertex="1">
-          <mxGeometry height="50" width="280" x="940" y="800" as="geometry" />
-        </mxCell>
-        <mxCell id="prod-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontSize=12;fontStyle=1;fontColor=#1E3A8A;verticalAlign=top;align=center;" value="PROD VPC — 10.3.0.0/20&#xa;(Backup target: Environment=prod)" vertex="1">
-          <mxGeometry height="100" width="380" x="1280" y="760" as="geometry" />
-        </mxCell>
-        <mxCell id="prod-priv-sub" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Private Subnets&#xa;10.3.0.0/22, /4.0/22&#xa;(TGW-attached)" vertex="1">
-          <mxGeometry height="50" width="340" x="1300" y="800" as="geometry" />
-        </mxCell>
-        <mxCell id="shared-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontSize=12;fontStyle=1;fontColor=#1E3A8A;verticalAlign=top;align=center;" value="SHARED SERVICES VPC — 10.4.0.0/20" vertex="1">
-          <mxGeometry height="100" width="380" x="1770" y="760" as="geometry" />
-        </mxCell>
-        <mxCell id="shared-priv-sub" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#93C5FD;strokeColor=#1D4ED8;fontSize=10;fontColor=#1E3A8A;" value="Private Subnets&#xa;10.4.0.0/22, /4.0/22&#xa;(TGW-attached)" vertex="1">
-          <mxGeometry height="50" width="340" x="1790" y="800" as="geometry" />
-        </mxCell>
-        <mxCell id="hub-pub-link" edge="1" parent="1" source="hub-pub-sub1" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;flowAnimation=1;" target="hub-nat-gw">
+
+        <!-- Edge layer arrows — CURVED for the OIDC chain -->
+        <mxCell id="e-internet-github" edge="1" parent="1" source="icon-internet" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#545B64;strokeWidth=2;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="icon-github" value="clone / PR">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hub-priv-link" edge="1" parent="1" source="hub-priv-sub" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;flowAnimation=1;" target="hub-nat-gw">
+        <mxCell id="e-github-gha" edge="1" parent="1" source="icon-github" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#545B64;strokeWidth=2;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="icon-gha" value="push / PR">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hub-tgw-edge" edge="1" parent="1" source="hub-priv-sub" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;strokeWidth=2;flowAnimation=1;" target="tgw" value="TGW Attachment&#xa;(hub private subnet)">
+        <mxCell id="e-gha-oidc" edge="1" parent="1" source="icon-gha" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#FF9900;strokeWidth=3;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="icon-cognito" value="1. JWT&#10;   (id_token)">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dev-tgw-edge" edge="1" parent="1" source="dev-priv-sub" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;strokeWidth=2;flowAnimation=1;" target="tgw" value="TGW Attachment">
+        <mxCell id="e-oidc-sts" edge="1" parent="1" source="icon-cognito" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#FF9900;strokeWidth=3;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="icon-sts" value="2. AssumeRole&#10;WithWebIdentity">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="test-tgw-edge" edge="1" parent="1" source="test-priv-sub" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;strokeWidth=2;flowAnimation=1;" target="tgw" value="TGW Attachment">
+        <mxCell id="e-sts-role" edge="1" parent="1" source="icon-sts" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#FF9900;strokeWidth=3;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="icon-gha-role" value="3. Returns&#10;   temp creds">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="prod-tgw-edge" edge="1" parent="1" source="prod-priv-sub" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;strokeWidth=2;flowAnimation=1;" target="tgw" value="TGW Attachment">
+        <mxCell id="e-role-s3" edge="1" parent="1" source="icon-gha-role" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=2;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;dashed=1;" target="icon-s3-state" value="4. State lock / read&#10;   (use_lockfile)">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="shared-tgw-edge" edge="1" parent="1" source="shared-priv-sub" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;strokeWidth=2;flowAnimation=1;" target="tgw" value="TGW Attachment">
+        <mxCell id="e-kms-s3" edge="1" parent="1" source="icon-kms-state" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="icon-s3-state" value="SSE-KMS">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="inet-igw" edge="1" parent="1" source="internet-cloud" style="endArrow=classic;html=1;rounded=0;strokeColor=#DC2626;strokeWidth=2;flowAnimation=1;" target="internet-gw" value="Egress">
+        <mxCell id="e-admin-gha" edge="1" parent="1" source="icon-user-admin" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#545B64;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;dashed=1;" target="icon-gha-role" value="local apply&#10;(bootstrap)">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="igw-hub-link" edge="1" parent="1" source="internet-gw" style="endArrow=classic;html=1;rounded=0;strokeColor=#1D4ED8;strokeWidth=2;flowAnimation=1;" target="hub-vpc">
+
+        <!-- Numbered badges on OIDC chain (control plane) -->
+        <mxCell id="badge-1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#232F3E;strokeWidth=2;fontSize=14;fontStyle=1;fontColor=#FFFFFF;shadow=1;" value="1" vertex="1">
+          <mxGeometry height="26" width="26" x="494" y="158" as="geometry" />
+        </mxCell>
+        <mxCell id="badge-2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#232F3E;strokeWidth=2;fontSize=14;fontStyle=1;fontColor=#FFFFFF;shadow=1;" value="2" vertex="1">
+          <mxGeometry height="26" width="26" x="634" y="158" as="geometry" />
+        </mxCell>
+        <mxCell id="badge-3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#232F3E;strokeWidth=2;fontSize=14;fontStyle=1;fontColor=#FFFFFF;shadow=1;" value="3" vertex="1">
+          <mxGeometry height="26" width="26" x="774" y="158" as="geometry" />
+        </mxCell>
+        <mxCell id="badge-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1D8102;strokeColor=#232F3E;strokeWidth=2;fontSize=14;fontStyle=1;fontColor=#FFFFFF;shadow=1;" value="4" vertex="1">
+          <mxGeometry height="26" width="26" x="1054" y="158" as="geometry" />
+        </mxCell>
+
+        <!-- Edge layer detail cards (bold text) -->
+        <mxCell id="state-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D8102;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#232F3E;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;shadow=1;" value="STATE BACKEND — balraj-personal-lab-tfstate&#10;&#10;• SSE-KMS encryption + bucket key&#10;• Versioning enabled&#10;• Object Lock (Compliance)&#10;• Public Access Block (all 4)&#10;• S3 native lockfile (use_lockfile = true) — no DynamoDB&#10;• Key: landing-zone/terraform.tfstate&#10;• Region: us-east-1" vertex="1">
+          <mxGeometry height="130" width="540" x="1400" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-iam-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#232F3E;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;shadow=1;" value="GITHUB ACTIONS ROLE — github-actions-landing-zone-role&#10;&#10;• Trust: token.actions.githubusercontent.com&#10;  • aud = sts.amazonaws.com&#10;  • sub = repo:SinghWorld/b-aws-tf-gha-landing-zone:ref:refs/heads/main&#10;            OR :pull_request (any branch)&#10;• Managed: PowerUserAccess&#10;• Inline: scoped IAM mgmt (since PowerUserAccess excludes IAM)&#10;• Default tags: Project=personal-landing-zone, ManagedBy=terraform" vertex="1">
+          <mxGeometry height="140" width="600" x="1960" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-workflows-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9900;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#232F3E;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;shadow=1;" value="CI/CD WORKFLOWS — .github/workflows/&#10;&#10;• terraform-plan-apply.yml  →  PR: plan artifact · push to main: apply (env: production, manual approval)&#10;• drift-detection.yml      →  daily 22:00 UTC, plan -detailed-exitcode, opens Issue on drift&#10;• Runner: ubuntu-latest · Terraform 1.7.5 · AWS provider ~&gt; 5.0&#10;• Permissions: id-token:write, contents:read, pull-requests:write" vertex="1">
+          <mxGeometry height="120" width="1000" x="2560" y="145" as="geometry" />
+        </mxCell>
+
+        <!-- Down arrow into AWS Cloud — curved, bold -->
+        <mxCell id="edge-to-cloud" edge="1" parent="1" source="icon-gha-role" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#FF9900;strokeWidth=4;fontSize=12;fontStyle=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;shadow=1;" target="aws-cloud" value="terraform apply → manages all AWS resources below">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="gh-flow" edge="1" parent="1" source="github-actions" style="endArrow=classic;html=1;rounded=0;strokeColor=#DC2626;strokeWidth=1;fontSize=10;flowAnimation=1;" target="oidc-provider" value="1. Workflow run&#xa;(terraform-plan-apply.yml)">
+
+        <!-- ====================== AWS CLOUD CONTAINER (with gradient + shadow) ====================== -->
+        <mxCell id="aws-cloud" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F8FC;strokeColor=#7AA1C2;strokeWidth=3;dashed=0;fontSize=14;fontStyle=1;fontColor=#232F3E;verticalAlign=top;align=left;spacingLeft=20;spacingTop=8;shadow=1;gradientColor=#E0EFFA;gradientDirection=north;" value="AWS CLOUD · Single Account (simulating Control Tower / Org model)" vertex="1">
+          <mxGeometry height="1500" width="3520" x="40" y="330" as="geometry" />
+        </mxCell>
+
+        <!-- Region container inside AWS Cloud -->
+        <mxCell id="region-us-east-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D8102;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#1D8102;verticalAlign=top;align=left;spacingLeft=15;spacingTop=6;shadow=1;gradientColor=#F5FCF7;gradientDirection=north;" value="Region: us-east-1  (IAM boundaries region-locked to this region)" vertex="1">
+          <mxGeometry height="1430" width="3460" x="70" y="375" as="geometry" />
+        </mxCell>
+
+        <!-- ============== NETWORK LAYER (Hub & Spoke) ============== -->
+        <mxCell id="layer-network" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F1FA;strokeColor=#0073BB;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=15;spacingTop=4;" value="NETWORK — Hub &amp; Spoke via Transit Gateway" vertex="1">
+          <mxGeometry height="700" width="3380" x="110" y="410" as="geometry" />
+        </mxCell>
+
+        <!-- HUB VPC -->
+        <mxCell id="hub-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0073BB;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;shadow=1;gradientColor=#F0F7FE;gradientDirection=south;" value="HUB VPC  ·  10.0.0.0/24  ·  Egress &amp; Inspection" vertex="1">
+          <mxGeometry height="660" width="560" x="140" y="440" as="geometry" />
+        </mxCell>
+
+        <!-- IGW -->
+        <mxCell id="hub-igw" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.internet_gateway;sketch=0;fontSize=11;fontStyle=1;fontColor=#0073BB;shadow=1;" value="Internet&#10;Gateway" vertex="1">
+          <mxGeometry height="55" width="55" x="180" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-nat" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.nat_gateway;sketch=0;fontSize=11;fontStyle=1;fontColor=#0073BB;shadow=1;" value="NAT Gateway&#10;(single, lab)" vertex="1">
+          <mxGeometry height="55" width="55" x="290" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-eip" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_ip;sketch=0;fontSize=10;fontStyle=1;fontColor=#0073BB;shadow=1;" value="Elastic IP" vertex="1">
+          <mxGeometry height="45" width="45" x="380" y="498" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-rt-pub" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_table;sketch=0;fontSize=10;fontStyle=1;fontColor=#0073BB;shadow=1;" value="Public RT&#10;0.0.0.0/0 → IGW" vertex="1">
+          <mxGeometry height="45" width="45" x="455" y="498" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-rt-priv" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_table;sketch=0;fontSize=10;fontStyle=1;fontColor=#0073BB;shadow=1;" value="Private RT&#10;0.0.0.0/0 → NAT" vertex="1">
+          <mxGeometry height="45" width="45" x="525" y="498" as="geometry" />
+        </mxCell>
+
+        <!-- Hub subnets (bold text) -->
+        <mxCell id="hub-sub-pub1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D6EAF8;strokeColor=#0073BB;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;verticalAlign=top;shadow=0;" value="Public Subnet&#10;10.0.0.0/27 — us-east-1a&#10;map_public_ip_on_launch = true" vertex="1">
+          <mxGeometry height="60" width="180" x="180" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-sub-pub2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D6EAF8;strokeColor=#0073BB;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;verticalAlign=top;shadow=0;" value="Public Subnet&#10;10.0.0.32/27 — us-east-1b&#10;map_public_ip_on_launch = true" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-sub-priv1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;verticalAlign=top;shadow=0;" value="Private Subnet&#10;10.0.0.64/27 — us-east-1a&#10;TGW-attached" vertex="1">
+          <mxGeometry height="60" width="180" x="180" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-sub-priv2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;verticalAlign=top;shadow=0;" value="Private Subnet&#10;10.0.0.96/27 — us-east-1b&#10;TGW-attached" vertex="1">
+          <mxGeometry height="60" width="180" x="380" y="660" as="geometry" />
+        </mxCell>
+
+        <!-- Hub NAT routing (curved) -->
+        <mxCell id="hub-rt-pub-arrow" edge="1" parent="1" source="hub-rt-pub" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=1;fontSize=9;fontStyle=1;exitX=0.5;exitY=1;entryX=0.25;entryY=0;" target="hub-sub-pub1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="oidc-trust" edge="1" parent="1" source="oidc-provider" style="endArrow=classic;html=1;rounded=0;strokeColor=#EA580C;strokeWidth=2;fontSize=10;flowAnimation=1;" target="github-oidc-role" value="2. AssumeRoleWithWebIdentity&#xa;(sub: repo:ORG/REPO:ref or :pull_request)">
+        <mxCell id="hub-rt-pub-arrow2" edge="1" parent="1" source="hub-rt-pub" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=1;fontSize=9;fontStyle=1;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" target="hub-sub-pub2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="gh-state" edge="1" parent="1" source="github-oidc-role" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=1;fontSize=10;flowAnimation=1;" target="s3-state-bucket" value="3. State lock / read&#xa;(terraform init/plan/apply)">
+        <mxCell id="hub-nat-arrow" edge="1" parent="1" source="hub-nat" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=1;fontSize=9;fontStyle=1;exitX=0.5;exitY=1;entryX=0.25;entryY=0;" target="hub-sub-priv1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="gh-deploy" edge="1" parent="1" source="github-oidc-role" style="endArrow=classic;html=1;rounded=0;strokeColor=#EA580C;strokeWidth=1;fontSize=10;flowAnimation=1;" target="tgw" value="4. Manage AWS resources&#xa;(terraform apply)">
+        <mxCell id="hub-nat-arrow2" edge="1" parent="1" source="hub-nat" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=1;fontSize=9;fontStyle=1;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" target="hub-sub-priv2">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="layer-security" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#EA580C;fontSize=14;fontStyle=1;fontColor=#7C2D12;verticalAlign=top;align=center;" value="SECURITY / IAM LAYER — SCP-equivalent Permission Boundaries" vertex="1">
-          <mxGeometry height="500" width="1500" x="40" y="890" as="geometry" />
-        </mxCell>
-        <mxCell id="boundary-dev" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FED7AA;strokeColor=#EA580C;fontSize=9;fontColor=#7C2D12;align=left;spacing=8;" value="boundary-dev policy&#xa;&#xa;• AllowWithinBoundary&#xa;• DenyCrossEnvironmentAccess&#xa;  (ec2/rds/s3/dynamodb&#xa;   if Environment ≠ dev)&#xa;• DenyDisablingSecurityTooling&#xa;• DenyOutsideHomeRegion&#xa;  (us-east-1)" vertex="1">
-          <mxGeometry height="170" width="320" x="60" y="940" as="geometry" />
-        </mxCell>
-        <mxCell id="boundary-test" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FED7AA;strokeColor=#EA580C;fontSize=9;fontColor=#7C2D12;align=left;spacing=8;" value="boundary-test policy&#xa;&#xa;• AllowWithinBoundary&#xa;• DenyCrossEnvironmentAccess&#xa;• DenyDisablingSecurityTooling&#xa;• DenyOutsideHomeRegion" vertex="1">
-          <mxGeometry height="170" width="320" x="400" y="940" as="geometry" />
-        </mxCell>
-        <mxCell id="boundary-prod" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FED7AA;strokeColor=#EA580C;fontSize=9;fontColor=#7C2D12;align=left;spacing=8;" value="boundary-prod policy&#xa;&#xa;• AllowWithinBoundary&#xa;• DenyCrossEnvironmentAccess&#xa;• DenyDisablingSecurityTooling&#xa;• DenyOutsideHomeRegion" vertex="1">
-          <mxGeometry height="170" width="320" x="740" y="940" as="geometry" />
-        </mxCell>
-        <mxCell id="role-dev" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=10;fontStyle=1;fontColor=#7C2D12;align=center;" value="dev-admin-role&#xa;(PowerUserAccess&#xa; + boundary-dev)" vertex="1">
-          <mxGeometry height="80" width="320" x="60" y="1140" as="geometry" />
-        </mxCell>
-        <mxCell id="role-test" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=10;fontStyle=1;fontColor=#7C2D12;align=center;" value="test-admin-role&#xa;(PowerUserAccess&#xa; + boundary-test)" vertex="1">
-          <mxGeometry height="80" width="320" x="400" y="1140" as="geometry" />
-        </mxCell>
-        <mxCell id="role-prod" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=10;fontStyle=1;fontColor=#7C2D12;align=center;" value="prod-admin-role&#xa;(PowerUserAccess&#xa; + boundary-prod)" vertex="1">
-          <mxGeometry height="80" width="320" x="740" y="1140" as="geometry" />
-        </mxCell>
-        <mxCell id="trust-principal" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=10;fontColor=#7F1D1D;" value="Trusted Principal (IAM user / admin)&#xa;assumes via STS AssumeRole" vertex="1">
-          <mxGeometry height="50" width="1000" x="60" y="1260" as="geometry" />
-        </mxCell>
-        <mxCell id="tp-dev" edge="1" parent="1" source="trust-principal" style="endArrow=classic;html=1;rounded=0;strokeColor=#DC2626;flowAnimation=1;" target="role-dev">
+
+        <!-- IGW → Internet (off-cloud, curved) -->
+        <mxCell id="igw-internet" edge="1" parent="1" source="hub-igw" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#545B64;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;dashed=0;shadow=1;" target="icon-internet" value="0.0.0.0/0&#10;egress">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="tp-test" edge="1" parent="1" source="trust-principal" style="endArrow=classic;html=1;rounded=0;strokeColor=#DC2626;flowAnimation=1;" target="role-test">
+
+        <!-- Hub notes (bold) -->
+        <mxCell id="hub-notes" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#B7950B;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#7D6608;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="Hub: only VPC with IGW + NAT.&#10;Spokes reach internet via TGW → hub.&#10;Single NAT = cost-optimized (lab)." vertex="1">
+          <mxGeometry height="60" width="560" x="140" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="hub-iam-note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#C0392B;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#922B21;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="Hub + Shared are NOT covered by IAM permission boundaries — they inherit the deploying principal's permissions." vertex="1">
+          <mxGeometry height="60" width="560" x="140" y="820" as="geometry" />
+        </mxCell>
+
+        <!-- Transit Gateway -->
+        <mxCell id="tgw-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0073BB;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;shadow=1;gradientColor=#E8F1FA;gradientDirection=south;" value="AWS TRANSIT GATEWAY  ·  personal-lab-tgw" vertex="1">
+          <mxGeometry height="660" width="280" x="720" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="icon-tgw" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.transit_gateway;sketch=0;fontSize=12;fontStyle=1;fontColor=#0073BB;shadow=1;" value="Transit&#10;Gateway" vertex="1">
+          <mxGeometry height="80" width="80" x="820" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="tgw-rt" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_table;sketch=0;fontSize=10;fontStyle=1;fontColor=#0073BB;shadow=1;" value="Shared RT&#10;(5 attachments)" vertex="1">
+          <mxGeometry height="45" width="45" x="838" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="tgw-attach" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="VPC Attachments&#10;• hub (private)&#10;• dev&#10;• test&#10;• prod&#10;• shared" vertex="1">
+          <mxGeometry height="120" width="240" x="730" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="tgw-notes" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#B7950B;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#7D6608;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="• Single shared route table&#10;• Default assoc/prop = DISABLED (explicit routing)&#10;• DNS support: ENABLED&#10;• All 5 VPCs propagate" vertex="1">
+          <mxGeometry height="100" width="240" x="730" y="830" as="geometry" />
+        </mxCell>
+
+        <!-- ============== SPOKE VPCs ============== -->
+        <!-- DEV VPC -->
+        <mxCell id="dev-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0073BB;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;shadow=1;gradientColor=#F0F7FE;gradientDirection=south;" value="DEV VPC  ·  10.1.0.0/20" vertex="1">
+          <mxGeometry height="280" width="580" x="1020" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="dev-sub1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.1.0.0/22 — us-east-1a&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="265" x="1040" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="dev-sub2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.1.4.0/22 — us-east-1b&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="265" x="1320" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="dev-workload" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4F6F6;strokeColor=#7F8C8D;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;fontColor=#566573;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="[ Workload placeholder ]&#10;EC2 / ECS / RDS&#10;Tagged: Environment=dev" vertex="1">
+          <mxGeometry height="80" width="545" x="1040" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="dev-iam-bound" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD0;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="IAM: dev-admin-role + boundary-dev&#10;(PowerUserAccess ∩ dev-tag enforcement)" vertex="1">
+          <mxGeometry height="50" width="265" x="1040" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="dev-backup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#1D8102;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="Backup: NOT in selection&#10;(tag Environment≠prod)" vertex="1">
+          <mxGeometry height="50" width="265" x="1320" y="670" as="geometry" />
+        </mxCell>
+
+        <!-- TEST VPC -->
+        <mxCell id="test-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0073BB;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;shadow=1;gradientColor=#F0F7FE;gradientDirection=south;" value="TEST VPC  ·  10.2.0.0/20" vertex="1">
+          <mxGeometry height="280" width="580" x="1620" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="test-sub1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.2.0.0/22 — us-east-1a&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="265" x="1640" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="test-sub2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.2.4.0/22 — us-east-1b&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="265" x="1920" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="test-workload" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4F6F6;strokeColor=#7F8C8D;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;fontColor=#566573;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="[ Workload placeholder ]&#10;EC2 / ECS / RDS&#10;Tagged: Environment=test" vertex="1">
+          <mxGeometry height="80" width="545" x="1640" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="test-iam-bound" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD0;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="IAM: test-admin-role + boundary-test&#10;(PowerUserAccess ∩ test-tag enforcement)" vertex="1">
+          <mxGeometry height="50" width="265" x="1640" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="test-backup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#1D8102;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="Backup: NOT in selection&#10;(tag Environment≠prod)" vertex="1">
+          <mxGeometry height="50" width="265" x="1920" y="670" as="geometry" />
+        </mxCell>
+
+        <!-- PROD VPC -->
+        <mxCell id="prod-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0073BB;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;shadow=1;gradientColor=#F0F7FE;gradientDirection=south;" value="PROD VPC  ·  10.3.0.0/20  ·  Backup target (Environment=prod)" vertex="1">
+          <mxGeometry height="280" width="580" x="2220" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="prod-sub1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.3.0.0/22 — us-east-1a&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="265" x="2240" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="prod-sub2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.3.4.0/22 — us-east-1b&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="265" x="2520" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="prod-workload" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4F6F6;strokeColor=#7F8C8D;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;fontColor=#566573;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="[ Workload placeholder ]&#10;EC2 / ECS / RDS&#10;Tagged: Environment=prod  ←  backup selected" vertex="1">
+          <mxGeometry height="80" width="545" x="2240" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="prod-iam-bound" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD0;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="IAM: prod-admin-role + boundary-prod&#10;(PowerUserAccess ∩ prod-tag enforcement)" vertex="1">
+          <mxGeometry height="50" width="265" x="2240" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="prod-backup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#1D8102;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="Backup: SELECTED ✓&#10;(tag Environment=prod)" vertex="1">
+          <mxGeometry height="50" width="265" x="2520" y="670" as="geometry" />
+        </mxCell>
+
+        <!-- SHARED SERVICES VPC -->
+        <mxCell id="shared-vpc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0073BB;strokeWidth=2;dashed=0;fontSize=12;fontStyle=1;fontColor=#0073BB;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;shadow=1;gradientColor=#F0F7FE;gradientDirection=south;" value="SHARED SERVICES VPC  ·  10.4.0.0/20" vertex="1">
+          <mxGeometry height="280" width="600" x="2820" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-sub1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.4.0.0/22 — us-east-1a&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="275" x="2840" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-sub2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#0073BB;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;spacingLeft=8;spacingTop=4;" value="Private Subnet&#10;10.4.4.0/22 — us-east-1b&#10;route: TGW → hub" vertex="1">
+          <mxGeometry height="55" width="275" x="3130" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-workload" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4F6F6;strokeColor=#7F8C8D;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;fontColor=#566573;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="[ Future shared services ]&#10;e.g. centralized EKS, AD connector,&#10;jumpbox, monitoring&#10;Tagged: Environment=shared" vertex="1">
+          <mxGeometry height="80" width="565" x="2840" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-iam-bound" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#C0392B;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#922B21;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="IAM: NOT bounded&#10;(no shared-admin-role)&#10;Inherits deploying principal" vertex="1">
+          <mxGeometry height="50" width="565" x="2840" y="670" as="geometry" />
+        </mxCell>
+
+        <!-- TGW ↔ VPC edges — CURVED for organic symmetry -->
+        <mxCell id="hub-tgw" edge="1" parent="1" source="hub-sub-priv1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=3;fontSize=10;fontStyle=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;shadow=1;" target="icon-tgw" value="attach">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="tp-prod" edge="1" parent="1" source="trust-principal" style="endArrow=classic;html=1;rounded=0;strokeColor=#DC2626;flowAnimation=1;" target="role-prod">
+        <mxCell id="dev-tgw" edge="1" parent="1" source="dev-sub1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0;exitY=0.5;entryX=1;entryY=0.3;" target="icon-tgw">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="role-dev-vpc" edge="1" parent="1" source="role-dev" style="endArrow=classic;html=1;rounded=0;strokeColor=#EA580C;strokeWidth=1;dashed=1;flowAnimation=1;" target="dev-vpc" value="Manages">
+        <mxCell id="test-tgw" edge="1" parent="1" source="test-sub1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0;exitY=0.5;entryX=1;entryY=0.4;" target="icon-tgw">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="role-test-vpc" edge="1" parent="1" source="role-test" style="endArrow=classic;html=1;rounded=0;strokeColor=#EA580C;strokeWidth=1;dashed=1;flowAnimation=1;" target="test-vpc" value="Manages">
+        <mxCell id="prod-tgw" edge="1" parent="1" source="prod-sub1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0;exitY=0.5;entryX=1;entryY=0.6;" target="icon-tgw">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="role-prod-vpc" edge="1" parent="1" source="role-prod" style="endArrow=classic;html=1;rounded=0;strokeColor=#EA580C;strokeWidth=1;dashed=1;flowAnimation=1;" target="prod-vpc" value="Manages">
+        <mxCell id="shared-tgw" edge="1" parent="1" source="shared-sub1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=2;fontSize=10;fontStyle=1;exitX=0;exitY=0.5;entryX=1;entryY=0.7;" target="icon-tgw">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="sec-baseline" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=12;fontStyle=1;fontColor=#7C2D12;align=center;" value="SECURITY BASELINE&#xa;(Audit account equivalent)" vertex="1">
-          <mxGeometry height="40" width="1000" x="60" y="1340" as="geometry" />
+
+        <!-- Network notes (bold) -->
+        <mxCell id="net-notes" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#B7950B;strokeWidth=1;fontSize=10;fontStyle=1;fontColor=#7D6608;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="⚠ TODO — environments/hub/main.tf: spoke private route tables need a second apply pass&#10;   to add `aws_route 0.0.0.0/0 → TGW-id` after private_route_table_ids becomes stable." vertex="1">
+          <mxGeometry height="60" width="1620" x="140" y="990" as="geometry" />
         </mxCell>
-        <mxCell id="guardduty" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=10;fontColor=#7C2D12;align=center;" value="GuardDuty Detector&#xa;(15min finding frequency, all regions)" vertex="1">
-          <mxGeometry height="70" width="300" x="80" y="1390" as="geometry" />
+        <mxCell id="net-nat-flow" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F1FA;strokeColor=#0073BB;strokeWidth=2;fontSize=10;fontStyle=1;fontColor=#1B4F72;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="EGRESS PATH (spoke → internet):&#10;  spoke subnet → spoke private RT → TGW → hub private RT → NAT GW → IGW → Internet" vertex="1">
+          <mxGeometry height="60" width="1620" x="1820" y="990" as="geometry" />
         </mxCell>
-        <mxCell id="sechub" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=10;fontColor=#7C2D12;align=center;" value="Security Hub&#xa;(default standards)&#xa;+ CIS Foundations v3.0.0&#xa;  subscription" vertex="1">
-          <mxGeometry height="70" width="300" x="410" y="1390" as="geometry" />
+
+        <!-- ============== SECURITY / IAM LAYER ============== -->
+        <mxCell id="layer-security" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF5E7;strokeColor=#E67E22;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#7E5109;verticalAlign=top;align=left;spacingLeft=15;spacingTop=4;" value="IDENTITY &amp; SECURITY — IAM Permission Boundaries (SCP-equivalent)" vertex="1">
+          <mxGeometry height="320" width="1700" x="110" y="1130" as="geometry" />
         </mxCell>
-        <mxCell id="config-recorder" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEDD5;strokeColor=#EA580C;fontSize=10;fontColor=#7C2D12;align=center;" value="AWS Config&#xa;Recorder + Delivery Channel&#xa;(recorder role: config-recorder-role)" vertex="1">
-          <mxGeometry height="70" width="300" x="740" y="1390" as="geometry" />
+
+        <!-- Trusted Principal -->
+        <mxCell id="trust-principal" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FADBD8;strokeColor=#C0392B;strokeWidth=1;fontSize=11;fontStyle=1;fontColor=#78281F;align=center;verticalAlign=middle;shadow=1;" value="Trusted Principal (admin IAM user / role)" vertex="1">
+          <mxGeometry height="40" width="1620" x="150" y="1160" as="geometry" />
         </mxCell>
-        <mxCell id="layer-data" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#16A34A;fontSize=14;fontStyle=1;fontColor=#14532D;verticalAlign=top;align=center;" value="DATA / LOGGING LAYER — Log Archive equivalent" vertex="1">
-          <mxGeometry height="500" width="1600" x="1560" y="890" as="geometry" />
+        <mxCell id="trust-principal-sub" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#78281F;" value="assumes via STS AssumeRole (Boundary = permission_boundary arg)" vertex="1">
+          <mxGeometry height="14" width="600" x="150" y="1200" as="geometry" />
         </mxCell>
-        <mxCell id="log-bucket" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#D1FADF;strokeColor=#16A34A;fontSize=10;fontColor=#14532D;align=left;spacing=10;" value="S3 Log Archive Bucket&#xa;balraj-personal-lab-tfstate (separate naming convention&#xa;for log bucket name passed via log_bucket_name var)&#xa;&#xa;• SSE-KMS (aws/s3) + bucket key&#xa;• Versioning ENABLED&#xa;• Public Access Block (all 4)&#xa;• Lifecycle: 90d → STANDARD_IA,&#xa;                   180d → GLACIER,&#xa;                   365d expiry&#xa;• Policy denies: DeleteObject, non-TLS" vertex="1">
-          <mxGeometry height="220" width="400" x="1600" y="940" as="geometry" />
+
+        <!-- Boundary DEV -->
+        <mxCell id="boundary-dev" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD0;strokeColor=#E67E22;strokeWidth=2;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="boundary-dev (IAM Policy)&#10;&#10;■ AllowWithinBoundary&#10;■ DenyCrossEnvironmentAccess&#10;    ec2/rds/s3/dynamodb if Environment≠dev&#10;■ DenyDisablingSecurityTooling&#10;    StopLogging, DeleteTrail, DeleteDetector…&#10;■ DenyOutsideHomeRegion&#10;    ec2/rds outside us-east-1" vertex="1">
+          <mxGeometry height="160" width="520" x="150" y="1220" as="geometry" />
         </mxCell>
-        <mxCell id="cloudtrail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBF7D0;strokeColor=#16A34A;fontSize=10;fontColor=#14532D;align=center;" value="AWS CloudTrail&#xa;(multi-region trail)&#xa;&#xa;• log_file_validation&#xa;• include_global_service_events&#xa;• S3 prefix: cloudtrail/&#xa;• Bucket-owner-full-control ACL" vertex="1">
-          <mxGeometry height="120" width="320" x="2040" y="940" as="geometry" />
+        <mxCell id="role-dev" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAE5D3;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=center;shadow=1;" value="dev-admin-role&#10;PowerUserAccess + boundary-dev" vertex="1">
+          <mxGeometry height="44" width="520" x="150" y="1390" as="geometry" />
         </mxCell>
-        <mxCell id="config-delivery" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBF7D0;strokeColor=#16A34A;fontSize=10;fontColor=#14532D;align=center;" value="AWS Config Delivery&#xa;&#xa;• S3 prefix: config/&#xa;• SSE-KMS via bucket policy&#xa;• role: config-recorder-role&#xa;   (AWS_ConfigRole managed)" vertex="1">
-          <mxGeometry height="120" width="320" x="2400" y="940" as="geometry" />
+
+        <!-- Boundary TEST -->
+        <mxCell id="boundary-test" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD0;strokeColor=#E67E22;strokeWidth=2;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="boundary-test (IAM Policy)&#10;&#10;■ AllowWithinBoundary&#10;■ DenyCrossEnvironmentAccess&#10;    ec2/rds/s3/dynamodb if Environment≠test&#10;■ DenyDisablingSecurityTooling&#10;■ DenyOutsideHomeRegion" vertex="1">
+          <mxGeometry height="160" width="520" x="690" y="1220" as="geometry" />
         </mxCell>
-        <mxCell id="backup-vault" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FADF;strokeColor=#16A34A;fontSize=10;fontColor=#14532D;align=left;spacing=8;" value="AWS Backup Vault&#xa;personal-lab-backup-vault&#xa;&#xa;• Plan: personal-lab-backup-plan&#xa;   cron(0 3 * * ? *) = daily 03:00 UTC&#xa;• retain 35 days&#xa;• Selection tags:&#xa;   Environment = prod&#xa;• IAM role: aws-backup-service-role&#xa;   (backup + restore policies)" vertex="1">
-          <mxGeometry height="180" width="360" x="2780" y="940" as="geometry" />
+        <mxCell id="role-test" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAE5D3;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=center;shadow=1;" value="test-admin-role&#10;PowerUserAccess + boundary-test" vertex="1">
+          <mxGeometry height="44" width="520" x="690" y="1390" as="geometry" />
         </mxCell>
-        <mxCell id="backup-source-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#14532D;fontStyle=2;" value="(future) Resources tagged&#xa;Environment=prod in Prod VPC&#xa;are backed up here" vertex="1">
-          <mxGeometry height="40" width="360" x="2780" y="1130" as="geometry" />
+
+        <!-- Boundary PROD -->
+        <mxCell id="boundary-prod" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEBD0;strokeColor=#E67E22;strokeWidth=2;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="boundary-prod (IAM Policy)&#10;&#10;■ AllowWithinBoundary&#10;■ DenyCrossEnvironmentAccess&#10;    ec2/rds/s3/dynamodb if Environment≠prod&#10;■ DenyDisablingSecurityTooling&#10;■ DenyOutsideHomeRegion" vertex="1">
+          <mxGeometry height="160" width="520" x="1230" y="1220" as="geometry" />
         </mxCell>
-        <mxCell id="ct-bucket" edge="1" parent="1" source="cloudtrail" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=2;flowAnimation=1;" target="log-bucket" value="PutObject">
+        <mxCell id="role-prod" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAE5D3;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=center;shadow=1;" value="prod-admin-role&#10;PowerUserAccess + boundary-prod" vertex="1">
+          <mxGeometry height="44" width="520" x="1230" y="1390" as="geometry" />
+        </mxCell>
+
+        <!-- IAM role → VPC arrows — CURVED dashed -->
+        <mxCell id="role-dev-vpc" edge="1" parent="1" source="role-dev" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#E67E22;strokeWidth=1;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;fontSize=9;fontStyle=1;" target="dev-vpc">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="config-bucket" edge="1" parent="1" source="config-delivery" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=2;flowAnimation=1;" target="log-bucket" value="PutObject">
+        <mxCell id="role-test-vpc" edge="1" parent="1" source="role-test" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#E67E22;strokeWidth=1;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;fontSize=9;fontStyle=1;" target="test-vpc">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="gd-bucket" edge="1" parent="1" source="guardduty" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;dashed=1;flowAnimation=1;" target="log-bucket" value="Findings">
+        <mxCell id="role-prod-vpc" edge="1" parent="1" source="role-prod" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#E67E22;strokeWidth=1;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;fontSize=9;fontStyle=1;" target="prod-vpc">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="sh-bucket" edge="1" parent="1" source="sechub" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;dashed=1;flowAnimation=1;" target="log-bucket" value="Findings">
+
+        <!-- Trust principal → role arrows — CURVED red -->
+        <mxCell id="tp-dev" edge="1" parent="1" source="trust-principal" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#C0392B;strokeWidth=2;exitX=0.18;exitY=1;entryX=0.5;entryY=0;fontSize=9;fontStyle=1;shadow=1;" target="boundary-dev">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="configrec-cf" edge="1" parent="1" source="config-recorder" style="endArrow=classic;html=1;rounded=0;strokeColor=#EA580C;dashed=1;flowAnimation=1;" target="config-delivery" value="Status">
+        <mxCell id="tp-test" edge="1" parent="1" source="trust-principal" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#C0392B;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontSize=9;fontStyle=1;shadow=1;" target="boundary-test">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9FAFB;strokeColor=#6B7280;fontSize=11;fontColor=#1F2937;align=left;verticalAlign=top;spacing=10;" value="LEGEND&#xa;&#xa;■ RED: Internet / User / CI&#xa;■ BLUE: Network (VPC, TGW, subnets, IGW, NAT)&#xa;■ ORANGE: Security / IAM / GuardDuty&#xa;■ GREEN: Data / S3 / Backup / CloudTrail&#xa;■ PURPLE: (reserved) Compute&#xa;■ GREY: Observability" vertex="1">
-          <mxGeometry height="200" width="540" x="1560" y="1180" as="geometry" />
-        </mxCell>
-        <mxCell id="cmds" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9FAFB;strokeColor=#6B7280;fontSize=10;fontColor=#1F2937;align=left;verticalAlign=top;spacing=8;" value="OPERATIONAL NOTES&#xa;&#xa;• Single AWS account, multi-VPC isolation (Shared/Hub outside IAM boundary)&#xa;• Terraform state in S3 with use_lockfile (no DynamoDB)&#xa;• Two-phase bootstrap: scripts/01.setup_s3-backend.sh then local apply&#xa;• Spokes → hub routes via TGW currently NOT wired (TODO in environments/hub/main.tf)&#xa;• CIS Conformance Pack deferred to manual CLI post-apply&#xa;• Region-locked to us-east-1 by IAM boundary&#xa;• Destroy: scripts/02.destroy-s3-backend.sh" vertex="1">
-          <mxGeometry height="200" width="1040" x="2120" y="1180" as="geometry" />
-        </mxCell>
-        <mxCell id="prod-backup" edge="1" parent="1" source="prod-vpc" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;strokeWidth=2;dashed=1;flowAnimation=1;" target="backup-vault" value="Tag Environment=prod&#xa;→ Backup selection">
+        <mxCell id="tp-prod" edge="1" parent="1" source="trust-principal" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#C0392B;strokeWidth=2;exitX=0.82;exitY=1;entryX=0.5;entryY=0;fontSize=9;fontStyle=1;shadow=1;" target="boundary-prod">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="cf-bucket-d" edge="1" parent="1" source="config-delivery" style="endArrow=classic;html=1;rounded=0;strokeColor=#16A34A;dashed=0;flowAnimation=1;" target="log-bucket">
+
+        <!-- ============== SECURITY BASELINE ============== -->
+        <mxCell id="layer-sec-baseline" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF5E7;strokeColor=#E67E22;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#7E5109;verticalAlign=top;align=left;spacingLeft=15;spacingTop=4;" value="SECURITY BASELINE — Continuous Detection &amp; Posture" vertex="1">
+          <mxGeometry height="320" width="1640" x="1850" y="1130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-guardduty" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.guardduty;sketch=0;fontSize=11;fontStyle=1;fontColor=#7E5109;shadow=1;" value="Amazon&#10;GuardDuty" vertex="1">
+          <mxGeometry height="65" width="65" x="1900" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="gd-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="Detector: 15-min finding frequency&#10;Enabled across all regions&#10;Source: CloudTrail, VPC Flow Logs, DNS logs" vertex="1">
+          <mxGeometry height="70" width="430" x="1990" y="1200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-sechub" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.security_hub;sketch=0;fontSize=11;fontStyle=1;fontColor=#7E5109;shadow=1;" value="Security Hub" vertex="1">
+          <mxGeometry height="65" width="65" x="1900" y="1290" as="geometry" />
+        </mxCell>
+        <mxCell id="sh-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="Default standards + CIS AWS Foundations&#10;Benchmark v3.0.0 subscription&#10;(CIS Conformance Pack: deferred — see note)" vertex="1">
+          <mxGeometry height="70" width="430" x="1990" y="1290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-config" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.config;sketch=0;fontSize=11;fontStyle=1;fontColor=#7E5109;shadow=1;" value="AWS Config" vertex="1">
+          <mxGeometry height="65" width="65" x="1900" y="1380" as="geometry" />
+        </mxCell>
+        <mxCell id="cfg-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E67E22;fontSize=10;fontStyle=1;fontColor=#7E5109;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="Recorder + Delivery Channel&#10;Service role: AWS_ConfigRole (managed)&#10;S3 prefix: config/ (KMS-encrypted)" vertex="1">
+          <mxGeometry height="50" width="430" x="1990" y="1380" as="geometry" />
+        </mxCell>
+
+        <!-- Security → Logging arrows — CURVED dashed -->
+        <mxCell id="gd-arrow" edge="1" parent="1" source="gd-detail" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=1;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.2;fontSize=9;fontStyle=1;" target="icon-cloudtrail" value="findings">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="sh-arrow" edge="1" parent="1" source="sh-detail" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=1;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.4;fontSize=9;fontStyle=1;" target="icon-cloudtrail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cfg-arrow" edge="1" parent="1" source="cfg-detail" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=1;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.3;fontSize=9;fontStyle=1;" target="icon-cloudtrail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============== LOGGING / DATA LAYER ============== -->
+        <mxCell id="layer-logging" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1D8102;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#145A32;verticalAlign=top;align=left;spacingLeft=15;spacingTop=4;" value="LOGGING &amp; AUDIT — Log Archive equivalent (immutable evidence)" vertex="1">
+          <mxGeometry height="320" width="1620" x="110" y="1470" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-cloudtrail" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudtrail;sketch=0;fontSize=11;fontStyle=1;fontColor=#145A32;shadow=1;" value="AWS CloudTrail&#10;(multi-region trail)" vertex="1">
+          <mxGeometry height="65" width="65" x="160" y="1540" as="geometry" />
+        </mxCell>
+        <mxCell id="ct-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D8102;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="• log_file_validation: ENABLED&#10;• include_global_service_events: true&#10;• S3 prefix: cloudtrail/&#10;• ACL: bucket-owner-full-control" vertex="1">
+          <mxGeometry height="80" width="430" x="250" y="1540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-config-del" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.config;sketch=0;fontSize=11;fontStyle=1;fontColor=#145A32;shadow=1;" value="Config Delivery" vertex="1">
+          <mxGeometry height="65" width="65" x="160" y="1640" as="geometry" />
+        </mxCell>
+        <mxCell id="cd-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D8102;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="• S3 prefix: config/&#10;• Encrypted via SSE-KMS&#10;• Recorder role: AWS_ConfigRole&#10;• Recorder-status: ENABLED" vertex="1">
+          <mxGeometry height="80" width="430" x="250" y="1640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-log-bucket" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;sketch=0;fontSize=11;fontStyle=1;fontColor=#145A32;shadow=1;" value="S3 Log Archive&#10;(var.log_bucket_name)" vertex="1">
+          <mxGeometry height="75" width="75" x="760" y="1540" as="geometry" />
+        </mxCell>
+        <mxCell id="lb-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D8102;strokeWidth=2;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="S3 LOG ARCHIVE BUCKET (Hardened)&#10;&#10;■ Versioning: ENABLED&#10;■ SSE-KMS (aws/s3) + bucket key&#10;■ Public Access Block: all 4 enabled&#10;■ Lifecycle: 90d → STANDARD_IA · 180d → GLACIER · 365d EXPIRE&#10;■ Bucket policy DENIES: DeleteObject, non-TLS (aws:SecureTransport=false)&#10;■ Cross-account PutObject for CloudTrail + Config" vertex="1">
+          <mxGeometry height="170" width="880" x="860" y="1500" as="geometry" />
+        </mxCell>
+        <mxCell id="icon-log-kms" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kms;sketch=0;fontSize=10;fontStyle=1;fontColor=#145A32;shadow=1;" value="Log bucket&#10;KMS key" vertex="1">
+          <mxGeometry height="55" width="55" x="870" y="1685" as="geometry" />
+        </mxCell>
+
+        <!-- CloudTrail/Config → S3 (curved, thicker green) -->
+        <mxCell id="ct-s3" edge="1" parent="1" source="ct-detail" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=3;exitX=1;exitY=0.5;entryX=0;entryY=0.3;fontSize=10;fontStyle=1;shadow=1;" target="icon-log-bucket" value="PutObject&#10;(cloudtrail/)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cd-s3" edge="1" parent="1" source="cd-detail" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=3;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontSize=10;fontStyle=1;shadow=1;" target="icon-log-bucket" value="PutObject&#10;(config/)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============== BACKUP LAYER ============== -->
+        <mxCell id="layer-backup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1D8102;strokeWidth=1;fontSize=12;fontStyle=1;fontColor=#145A32;verticalAlign=top;align=left;spacingLeft=15;spacingTop=4;" value="BACKUP — Tag-based selection on Environment=prod" vertex="1">
+          <mxGeometry height="320" width="1620" x="1770" y="1470" as="geometry" />
+        </mxCell>
+
+        <mxCell id="icon-backup-vault" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.backup;sketch=0;fontSize=12;fontStyle=1;fontColor=#145A32;shadow=1;" value="AWS Backup&#10;Vault" vertex="1">
+          <mxGeometry height="80" width="80" x="1820" y="1560" as="geometry" />
+        </mxCell>
+        <mxCell id="backup-detail" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1D8102;strokeWidth=2;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="AWS BACKUP&#10;&#10;■ Vault: personal-lab-backup-vault&#10;■ Plan: personal-lab-backup-plan&#10;    Schedule: cron(0 3 * * ? *)  →  daily 03:00 UTC&#10;    Retention: 35 days&#10;■ Selection: tag Environment = prod&#10;■ Service role: aws-backup-service-role&#10;    Managed: AWSBackupServiceRolePolicyForBackup + …ForRestores" vertex="1">
+          <mxGeometry height="160" width="620" x="1920" y="1530" as="geometry" />
+        </mxCell>
+        <mxCell id="backup-target" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5F5E3;strokeColor=#1D8102;fontSize=10;fontStyle=1;fontColor=#145A32;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;shadow=1;" value="Target: any resource in PROD VPC tagged&#10;Environment=prod → snapshot → vault" vertex="1">
+          <mxGeometry height="50" width="620" x="1920" y="1700" as="geometry" />
+        </mxCell>
+
+        <!-- Backup flow: Prod VPC → Backup Vault — CURVED dashed -->
+        <mxCell id="prod-backup-arrow" edge="1" parent="1" source="prod-backup" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=3;dashed=1;exitX=0.5;exitY=1;entryX=0.1;entryY=0;fontSize=10;fontStyle=1;shadow=1;" target="icon-backup-vault" value="tag&#10;Environment=prod">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====================== LEGEND ====================== -->
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=2;fontSize=12;fontStyle=1;fontColor=#232F3E;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;shadow=1;" value="LEGEND — official AWS Architecture Icons (mxgraph.aws4)" vertex="1">
+          <mxGeometry height="340" width="3520" x="40" y="1850" as="geometry" />
+        </mxCell>
+
+        <!-- Legend row: Edge -->
+        <mxCell id="leg-edge-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#FF9900;" value="EDGE / CI / OIDC" vertex="1">
+          <mxGeometry height="20" width="280" x="60" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-edge-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7F0;strokeColor=#FF9900;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="60" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-internet" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.internet;sketch=0;fontSize=10;fontStyle=1;" value="Internet (Users)" vertex="1">
+          <mxGeometry height="40" width="40" x="80" y="1940" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-github" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.developer_tools;sketch=0;fontSize=10;fontStyle=1;" value="GitHub Repository" vertex="1">
+          <mxGeometry height="40" width="40" x="80" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-gha" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.codepipeline;sketch=0;fontSize=10;fontStyle=1;" value="GitHub Actions Workflow" vertex="1">
+          <mxGeometry height="40" width="40" x="80" y="2060" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-oidc" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cognito;sketch=0;fontSize=10;fontStyle=1;" value="IAM OIDC Provider" vertex="1">
+          <mxGeometry height="40" width="40" x="80" y="2120" as="geometry" />
+        </mxCell>
+
+        <!-- Legend row: Network -->
+        <mxCell id="leg-net-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#0073BB;" value="NETWORK" vertex="1">
+          <mxGeometry height="20" width="280" x="400" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-net-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F1FA;strokeColor=#0073BB;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="400" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-vpc" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpc;sketch=0;fontSize=10;fontStyle=1;" value="VPC" vertex="1">
+          <mxGeometry height="40" width="40" x="420" y="1940" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-subnet" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.subnet;sketch=0;fontSize=10;fontStyle=1;" value="Subnet (Public/Private)" vertex="1">
+          <mxGeometry height="40" width="40" x="420" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-igw" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.internet_gateway;sketch=0;fontSize=10;fontStyle=1;" value="Internet Gateway" vertex="1">
+          <mxGeometry height="40" width="40" x="420" y="2060" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-nat" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.nat_gateway;sketch=0;fontSize=10;fontStyle=1;" value="NAT Gateway" vertex="1">
+          <mxGeometry height="40" width="40" x="420" y="2120" as="geometry" />
+        </mxCell>
+
+        <!-- Legend row: Transit -->
+        <mxCell id="leg-tgw-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#0073BB;" value="TRANSIT &amp; ROUTING" vertex="1">
+          <mxGeometry height="20" width="280" x="740" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-tgw-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F1FA;strokeColor=#0073BB;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="740" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-tgw" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.transit_gateway;sketch=0;fontSize=10;fontStyle=1;" value="Transit Gateway" vertex="1">
+          <mxGeometry height="40" width="40" x="760" y="1940" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-rt" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_table;sketch=0;fontSize=10;fontStyle=1;" value="Route Table" vertex="1">
+          <mxGeometry height="40" width="40" x="760" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-eip" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_ip;sketch=0;fontSize=10;fontStyle=1;" value="Elastic IP" vertex="1">
+          <mxGeometry height="40" width="40" x="760" y="2060" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-vpce" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.endpoint;sketch=0;fontSize=10;fontStyle=1;" value="Endpoint (future use)" vertex="1">
+          <mxGeometry height="40" width="40" x="760" y="2120" as="geometry" />
+        </mxCell>
+
+        <!-- Legend row: Security -->
+        <mxCell id="leg-sec-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#7E5109;" value="SECURITY / IAM" vertex="1">
+          <mxGeometry height="20" width="280" x="1080" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-sec-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF5E7;strokeColor=#E67E22;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="1080" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-gd" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.guardduty;sketch=0;fontSize=10;fontStyle=1;" value="GuardDuty" vertex="1">
+          <mxGeometry height="40" width="40" x="1100" y="1940" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-sh" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.security_hub;sketch=0;fontSize=10;fontStyle=1;" value="Security Hub" vertex="1">
+          <mxGeometry height="40" width="40" x="1100" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-cfg" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.config;sketch=0;fontSize=10;fontStyle=1;" value="AWS Config" vertex="1">
+          <mxGeometry height="40" width="40" x="1100" y="2060" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-iam" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.iam_role;sketch=0;fontSize=10;fontStyle=1;" value="IAM Role" vertex="1">
+          <mxGeometry height="40" width="40" x="1100" y="2120" as="geometry" />
+        </mxCell>
+
+        <!-- Legend row: Logging -->
+        <mxCell id="leg-log-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#145A32;" value="LOGGING / DATA" vertex="1">
+          <mxGeometry height="20" width="280" x="1420" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-log-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1D8102;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="1420" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-ct" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudtrail;sketch=0;fontSize=10;fontStyle=1;" value="CloudTrail" vertex="1">
+          <mxGeometry height="40" width="40" x="1440" y="1940" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-s3" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;sketch=0;fontSize=10;fontStyle=1;" value="S3 Bucket" vertex="1">
+          <mxGeometry height="40" width="40" x="1440" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-kms" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.kms;sketch=0;fontSize=10;fontStyle=1;" value="KMS Key" vertex="1">
+          <mxGeometry height="40" width="40" x="1440" y="2060" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-backup" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.backup;sketch=0;fontSize=10;fontStyle=1;" value="AWS Backup" vertex="1">
+          <mxGeometry height="40" width="40" x="1440" y="2120" as="geometry" />
+        </mxCell>
+
+        <!-- Legend row: Observability + Identity -->
+        <mxCell id="leg-obs-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#545B64;" value="OBSERVABILITY / IDENTITY" vertex="1">
+          <mxGeometry height="20" width="280" x="1760" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-obs-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F4F6F6;strokeColor=#545B64;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="1760" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-sts" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sts;sketch=0;fontSize=10;fontStyle=1;" value="AWS STS" vertex="1">
+          <mxGeometry height="40" width="40" x="1780" y="1940" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-user" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.user;sketch=0;fontSize=10;fontStyle=1;" value="IAM User (Admin)" vertex="1">
+          <mxGeometry height="40" width="40" x="1780" y="2000" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-region" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.regions;sketch=0;fontSize=10;fontStyle=1;" value="AWS Region" vertex="1">
+          <mxGeometry height="40" width="40" x="1780" y="2060" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-icon-cw" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=right;verticalAlign=middle;align=center;html=1;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch;sketch=0;fontSize=10;fontStyle=1;" value="CloudWatch (reserved)" vertex="1">
+          <mxGeometry height="40" width="40" x="1780" y="2120" as="geometry" />
+        </mxCell>
+
+        <!-- Legend: Arrow types — CURVED swatches -->
+        <mxCell id="leg-arrow-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#232F3E;" value="ARROW TYPES" vertex="1">
+          <mxGeometry height="20" width="280" x="2100" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" value="" vertex="1">
+          <mxGeometry height="280" width="320" x="2100" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-1" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#FF9900;strokeWidth=3;shadow=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2120" y="1955" as="sourcePoint" />
+            <mxPoint x="2280" y="1955" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arrow-1-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=1;fontColor=#232F3E;" value="OIDC trust / STS flow" vertex="1">
+          <mxGeometry height="20" width="140" x="2290" y="1945" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-2" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#0073BB;strokeWidth=3;shadow=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2120" y="1995" as="sourcePoint" />
+            <mxPoint x="2280" y="1995" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arrow-2-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=1;fontColor=#232F3E;" value="Network traffic / route" vertex="1">
+          <mxGeometry height="20" width="140" x="2290" y="1985" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-3" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#1D8102;strokeWidth=3;shadow=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2120" y="2035" as="sourcePoint" />
+            <mxPoint x="2280" y="2035" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arrow-3-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=1;fontColor=#232F3E;" value="Log / data flow" vertex="1">
+          <mxGeometry height="20" width="140" x="2290" y="2025" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-4" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#E67E22;strokeWidth=2;dashed=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2120" y="2075" as="sourcePoint" />
+            <mxPoint x="2280" y="2075" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arrow-4-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=1;fontColor=#232F3E;" value="Tag-based selection / mgmt" vertex="1">
+          <mxGeometry height="20" width="160" x="2290" y="2065" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-5" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#C0392B;strokeWidth=2;shadow=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2120" y="2115" as="sourcePoint" />
+            <mxPoint x="2280" y="2115" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arrow-5-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=1;fontColor=#232F3E;" value="Trust / AssumeRole" vertex="1">
+          <mxGeometry height="20" width="140" x="2290" y="2105" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-arrow-6" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;curved=1;strokeColor=#545B64;strokeWidth=2;dashed=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2120" y="2155" as="sourcePoint" />
+            <mxPoint x="2280" y="2155" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-arrow-6-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontStyle=1;fontColor=#232F3E;" value="Local / bootstrap flow" vertex="1">
+          <mxGeometry height="20" width="140" x="2290" y="2145" as="geometry" />
+        </mxCell>
+
+        <!-- Legend: Operational notes -->
+        <mxCell id="leg-notes-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#232F3E;" value="OPERATIONAL NOTES &amp; CAVEATS" vertex="1">
+          <mxGeometry height="20" width="280" x="2440" y="1890" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-notes-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;dashed=1;fontSize=10;fontStyle=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=8;fontColor=#232F3E;shadow=1;" value="• Single AWS account; multi-VPC isolation (Hub/Shared outside IAM boundaries).&#10;• Region-locked to us-east-1 by IAM boundary statements.&#10;• Terraform state in S3 with use_lockfile (no DynamoDB).&#10;• Two-phase bootstrap: scripts/01.setup_s3-backend.sh then local apply.&#10;• Default tags on every resource: Project=personal-landing-zone, ManagedBy=terraform.&#10;• CIS Conformance Pack: deferred (S3 template URI moved by AWS) — Security Hub CIS v3.0.0 covers baseline.&#10;• Spoke → hub routes via TGW: TODO in environments/hub/main.tf (second apply pass).&#10;• Destroy: scripts/02.destroy-s3-backend.sh (also tears down S3 + GH secrets + env).&#10;• Estimated monthly cost: ~$80–120 AUD (TGW attachments + NAT dominate).&#10;• All arrows on this diagram are curved (curved=1) for organic readability." vertex="1">
+          <mxGeometry height="280" width="1100" x="2440" y="1910" as="geometry" />
+        </mxCell>
+
+        <!-- ====================== FOOTER ====================== -->
+        <mxCell id="footer" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#545B64;" value="Repo: SinghWorld/b-aws-tf-gha-landing-zone   ·   Terraform 1.7.5 / AWS provider ~&gt; 5.0   ·   Diagram drawn with draw.io AWS4 Architecture Icons (mxgraph.aws4)" vertex="1">
+          <mxGeometry height="20" width="3520" x="40" y="2210" as="geometry" />
+        </mxCell>
+
       </root>
     </mxGraphModel>
   </diagram>
